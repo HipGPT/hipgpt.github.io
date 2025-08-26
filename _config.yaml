@@ -1,0 +1,20 @@
+# _config.yml
+
+# Site settings
+title: HipGPT Documentation
+description: >-
+  A comprehensive guide to HipGPT, a GPT-2 implementation in C++ and HIP.
+baseurl: "/" # the subpath of your site, e.g. /blog
+url: "https://hipgpt.github.io" # the base hostname & protocol for your site
+github_username: aarnetalman
+
+# Build settings
+theme: minima
+plugins:
+  - jekyll-feed
+
+# Add a navigation menu
+header_pages:
+  - getting-started.md
+  - architecture.md
+  - license.md
