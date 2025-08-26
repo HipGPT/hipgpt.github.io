@@ -5,7 +5,7 @@ permalink: /license/
 ---
 # License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License. It is provided as is with no warranty of any kind. 
 
 ```
 MIT License
