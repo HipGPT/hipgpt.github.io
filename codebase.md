@@ -1,6 +1,6 @@
 ---
-layout: default
-title: Codebase Overview
+layout: base
+title: Codebase
 nav_order: 3
 ---
 
