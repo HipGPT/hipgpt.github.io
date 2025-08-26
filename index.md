@@ -14,7 +14,7 @@ This project provides a lightweight, from-scratch implementation of a GPT-2 styl
 
 The code is intended for educational purposes and is not recommended for production use of any kind. 
 
-**Code:** [https://github.com/aarnetalman/hipgpt](https://github.com/aarnetalman/hipgpt])
+**Code:** [https://github.com/aarnetalman/hipgpt](https://github.com/aarnetalman/hipgpt)
 
 ### Key Features:
 
