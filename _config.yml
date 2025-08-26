@@ -1,7 +1,7 @@
 # Site-wide settings
 # ------------------
 #
- title: HipGPT 
+ title: HipGPT - A GPT-2 Implementation in C++ and HIP
 #
  author:
    name: Aarne Talman
@@ -54,7 +54,7 @@
 #     * solarized-light    Light variant of solarized color scheme.
 #     * solarized-dark     Dark variant of solarized color scheme.
 #     * solarized          Adaptive skin for solarized color scheme skins.
-   skin: auto
+   skin: classic
 #
 #   Specific pages for site navigation.
 #     If you wish to link only specific pages in the site-navigation, use this

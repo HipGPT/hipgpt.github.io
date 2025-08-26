@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: base
 title: Getting Started
 permalink: /getting-started/
 ---
