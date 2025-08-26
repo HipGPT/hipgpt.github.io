@@ -12,6 +12,8 @@ permalink: /
 
 This project provides a lightweight, from-scratch implementation of a GPT-2 style transformer model written in C++ and accelerated using AMD's **[HIP API](https://rocm.docs.amd.com/projects/HIP/en/latest/)** for ROCm-enabled GPUs. The project is designed to be a clear and understandable guide to the inner workings of large language models.
 
+**Model size (default):** ~1.55M params (E=128, L=2, H=4, F=256, V≈5k, S=32)
+
 The code is intended for educational purposes and is not recommended for production use of any kind. 
 
 **Code:** [https://github.com/aarnetalman/hipgpt](https://github.com/aarnetalman/hipgpt)
