@@ -4,13 +4,9 @@ title: Home
 permalink: /
 ---
 
-<p align="center">
-  <img src="/assets/images/hip-hamster.png" alt="HipGPT Logo" width="200"/>
-</p>
-
 # Welcome to HipGPT Documentation
 
-This project provides a lightweight, from-scratch implementation of a GPT-2 style transformer model written in C++ and accelerated using AMD's **[HIP API](https://rocm.docs.amd.com/en/latest/understand/hip_api/hip_api.html)** for ROCm-enabled GPUs. The project is designed to be a clear and understandable guide to the inner workings of large language models.
+<img src="/assets/images/hip-hamster.png" alt="HipGPT Logo" width="200"/> This project provides a lightweight, from-scratch implementation of a GPT-2 style transformer model written in C++ and accelerated using AMD's **[HIP API](https://rocm.docs.amd.com/en/latest/understand/hip_api/hip_api.html)** for ROCm-enabled GPUs. The project is designed to be a clear and understandable guide to the inner workings of large language models.
 
 The code is intended for educational purposes and is not recommended for production use of any kind. 
 
