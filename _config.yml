@@ -54,7 +54,7 @@
 #     * solarized-light    Light variant of solarized color scheme.
 #     * solarized-dark     Dark variant of solarized color scheme.
 #     * solarized          Adaptive skin for solarized color scheme skins.
-   skin: solarized-light
+   skin: classic
 #
 #   Specific pages for site navigation.
 #     If you wish to link only specific pages in the site-navigation, use this
@@ -86,7 +86,7 @@
    social_links:
      - title: HipGPT
        icon: github
-       url: "https://hithub.com/aarnetalman.com/hipgpt"
+       url: "https://github.com/aarnetalman.com/hipgpt"
 #     - title: Jekyll at X (formerly Twitter)
 #       icon: x-twitter
 #       url: "https://x.com/jekyllrb"
