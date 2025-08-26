@@ -1,10 +1,10 @@
 ---
-layout: base
+layout: default
 title: Codebase Overview
-permalink: /codebase/
+nav_order: 3
 ---
 
-# 📂 Codebase Overview
+# Codebase Overview
 {: .no_toc }
 
 This page provides a comprehensive guide to the HipGPT codebase architecture and explains the purpose of each component. The project is designed to be **self-contained**, **readable**, and **educational**, allowing you to understand how a GPT-style transformer works from the ground up.
@@ -21,18 +21,18 @@ This page provides a comprehensive guide to the HipGPT codebase architecture and
 
 ```
 hipgpt/
-├── 📁 build/                 # Build outputs (CMake artifacts)
-├── 📁 data/                  # Training datasets
-│   └── tiny_shakespeare.txt
-├── 📁 scripts/               # Automation scripts
+├── build/                    # Build outputs (CMake artifacts)
+├── data/                     # Training datasets
+│   └── data.txt
+├── scripts/                  # Automation scripts
 │   ├── download_data.sh      # Dataset fetching
 │   └── run_train.sh          # End-to-end training
-├── 📁 include/               # Public headers
+├── include/                  # Public headers
 │   ├── gpt_model.h           # Main model interface
 │   ├── hip_kernels.h         # GPU kernel declarations
 │   ├── tokenizer.h           # BPE tokenizer interface
 │   └── transformer_layer.h   # Transformer block interface
-├── 📁 src/                   # Implementation files
+├── src/                      # Implementation files
 │   ├── generate.cpp          # Text generation CLI
 │   ├── gpt_model.cpp         # Model orchestration
 │   ├── hip_kernels.cpp       # GPU kernel implementations
@@ -48,7 +48,7 @@ hipgpt/
 
 ## Core Components
 
-### 🔤 Tokenizer
+### Tokenizer
 {: .d-inline-block }
 Essential
 {: .label .label-blue }
@@ -58,22 +58,23 @@ Essential
 The tokenizer implements Byte-Pair Encoding (BPE) from scratch, handling the conversion between human-readable text and model-compatible token sequences.
 
 **Key Responsibilities:**
-- **Vocabulary Training** — Learns subword tokens from training corpus
-- **Text Encoding** — Converts strings to token ID sequences  
-- **Text Decoding** — Reconstructs text from token sequences
-- **Serialization** — Saves/loads trained vocabulary using JSON
+- **Vocabulary Training:** Learns subword tokens from training corpus
+- **Text Encoding:** Converts strings to token ID sequences  
+- **Text Decoding:** Reconstructs text from token sequences
+- **Serialization:** Saves/loads trained vocabulary using JSON
 
 **Usage Example:**
 ```cpp
 Tokenizer tokenizer;
-tokenizer.train("data/tiny_shakespeare.txt", vocab_size=1000);
+tokenizer.train_bpe(text);
+tokenizer.save("tokenizer.json");
 auto tokens = tokenizer.encode("Hello, world!");
 std::string text = tokenizer.decode(tokens);
 ```
 
 ---
 
-### 🧠 Transformer Layer
+### Transformer Layer
 {: .d-inline-block }
 Core
 {: .label .label-green }
@@ -83,11 +84,11 @@ Core
 Implements a single GPT-style transformer block containing the fundamental attention and feed-forward mechanisms.
 
 **Architecture Components:**
-- **Multi-Head Self-Attention** — Parallel attention heads with QKV projections
-- **Feed-Forward Network** — Two-layer MLP with ReLU activation
-- **Residual Connections** — Skip connections around attention and FFN
-- **Layer Normalization** — Pre-normalization for stable training
-- **Dropout** — Regularization during training phase
+- **Multi-Head Self-Attention:** Parallel attention heads with QKV projections
+- **Feed-Forward Network:** Two-layer MLP with ReLU activation
+- **Residual Connections:** Skip connections around attention and FFN
+- **Layer Normalization:** Pre-normalization for stable training
+- **Dropout:** Regularization during training phase
 
 **Key Features:**
 - Each layer manages its own GPU memory and optimizer states
@@ -96,7 +97,7 @@ Implements a single GPT-style transformer block containing the fundamental atten
 
 ---
 
-### 🏗️ GPT Model
+### GPT Model
 {: .d-inline-block }
 Architecture
 {: .label .label-purple }
@@ -106,11 +107,11 @@ Architecture
 The main model class that orchestrates the complete GPT architecture by combining embeddings, transformer layers, and output projections.
 
 **Model Pipeline:**
-1. **Token Embeddings** — Maps token IDs to dense vectors
-2. **Positional Embeddings** — Adds position information  
-3. **Transformer Stack** — Sequential transformer layers
-4. **Output Projection** — Linear layer to vocabulary logits
-5. **Loss Computation** — Cross-entropy for training
+1. **Token Embeddings:** Maps token IDs to dense vectors
+2. **Positional Embeddings:** Adds position information  
+3. **Transformer Stack:** Sequential transformer layers
+4. **Output Projection:** Linear layer to vocabulary logits
+5. **Loss Computation:** Cross-entropy for training
 
 **Training Features:**
 - Automatic gradient computation and backpropagation
@@ -120,7 +121,7 @@ The main model class that orchestrates the complete GPT architecture by combinin
 
 ---
 
-### ⚡ HIP Kernels
+### HIP Kernels
 {: .d-inline-block }
 Performance
 {: .label .label-yellow }
@@ -133,42 +134,64 @@ Custom GPU kernels implemented in AMD HIP, providing transparent and educational
 
 | Kernel Category | Operations |
 |:----------------|:-----------|
-| **Linear Algebra** | Matrix multiplication, bias addition, transpose |
-| **Attention** | Multi-head QKV computation, scaled dot-product attention |
-| **Activations** | ReLU, Softmax |
-| **Normalization** | Layer normalization, dropout |
-| **Training** | Cross-entropy loss, accuracy computation, gradient updates |
+| **Linear Algebra** | Matrix multiplication, bias addition, transpose variants (A^T, B^T) |
+| **Attention** | Multi-head attention (forward/backward), scaled dot-product attention |
+| **Activations** | ReLU (forward/backward), Softmax |
+| **Normalization** | Layer normalization (forward/backward), dropout (forward/backward) |
+| **Embeddings** | Token/positional embedding lookup and gradients |
+| **Training** | Cross-entropy loss, accuracy computation |
+| **Optimization** | Adam optimizer, SGD parameter updates |
+| **Sampling** | Top-k sampling with temperature scaling |
+| **Utilities** | Mean pooling, in-place operations |
 
 **Design Philosophy:**
-- **Educational Transparency** — No black-box external libraries
-- **Performance Optimized** — Efficient memory access patterns
-- **Numerically Stable** — Careful handling of floating-point operations
+- **Educational Transparency:** No black-box external libraries
+- **Performance Optimized:** Efficient memory access patterns
+- **Numerically Stable:** Careful handling of floating-point operations
+- **Custom PRNG:** Implements XOR-WOW random number generation
 
 ---
 
 ## Application Entry Points
 
-### 🎯 Training Pipeline
+### Training Pipeline
 {: .d-inline-block }
 CLI
 {: .label .label-red }
 
 **File:** `src/train_gpt.cpp`
 
+Complete training workflow from raw text to trained model using step-based training.
+
 **Command-line Interface:**
 ```bash
 ./build/train_gpt \
-  --data data/data.txt \
-  --vocab_size 5000 \
-  --seq_length 128 \
-  --batch_size 32 \
-  --learning_rate 3e-4 \
-  --steps 10000
+  --data-path data/data.txt \
+  --vocab-size 5000 \
+  --seq 32 \
+  --batch 4 \
+  --lr 1e-2 \
+  --steps 1000
 ```
+
+**Available Parameters:**
+- `--data-path`: Training text file (default: `data/data.txt`)
+- `--vocab-size`: Maximum vocabulary size (default: 5000)
+- `--seq`: Sequence length (default: 32)
+- `--dim`: Embedding dimension (default: 128)
+- `--heads`: Number of attention heads (default: 4)
+- `--ff`: Feed-forward hidden dimension (default: 256)
+- `--layers`: Number of transformer layers (default: 2)
+- `--batch`: Batch size (default: 4)
+- `--steps`: Training steps (default: 10)
+- `--lr`: Learning rate (default: 1e-2)
+- `--log-every`: Log frequency (default: 50)
+- `--ckpt-every`: Checkpoint frequency (default: 500)
+- `--keep-last`: Number of step checkpoints to keep (default: 5)
 
 ---
 
-### 🔮 Text Generation
+### Text Generation
 {: .d-inline-block }
 CLI
 {: .label .label-red }
@@ -178,26 +201,43 @@ CLI
 Interactive text generation interface for trained models.
 
 **Generation Features:**
-- **Top-k Sampling** — Selects from k most likely tokens
-- **Temperature Control** — Adjusts randomness in generation
-- **Prompt Conditioning** — Starts generation from user input
-- **Real-time Output** — Streams generated text as it's produced
+- **Top-k Sampling:** Selects from k most likely tokens
+- **Temperature Control:** Adjusts randomness in generation
+- **Prompt Conditioning:** Starts generation from user input
+- **Real-time Streaming:** Outputs generated text as it's produced
+- **EOS Detection:** Stops generation at end-of-sequence tokens
 
 **Usage Example:**
 ```bash
 ./build/generate \
-  --model checkpoints/model_final.bin \
-  --tokenizer checkpoints/tokenizer.json \
   --prompt "To be or not to be" \
-  --max_tokens 100 \
-  --temperature 0.8
+  --ckpt gpt_checkpoint.bin \
+  --tokenizer tokenizer.json \
+  --num_tokens 100 \
+  --temperature 0.8 \
+  --top_k 10
 ```
+
+**Available Parameters:**
+- `--prompt`: Input text to continue (required)
+- `--ckpt`: Model checkpoint file (default: `gpt_checkpoint.bin`)
+- `--tokenizer`: Tokenizer file (default: `tokenizer.json`)
+- `--num_tokens`: Number of tokens to generate (default: 50)
+- `--max_seq_len`: Maximum sequence length (default: 32)
+- `--top_k`: Top-k sampling parameter (default: 5)
+- `--temp`: Temperature for sampling (default: 1.0)
+- `--stream`: Stream output token by token (default: true)
+- `--delay_ms`: Delay between tokens when streaming (default: 0)
+- `--eos_id`: End-of-sequence token ID to stop generation (default: -1)
+
+{: .highlight }
+> **Architecture Constraint:** The generation code uses hardcoded architecture parameters (embed_dim=128, num_heads=4, ff_hidden_dim=256, num_layers=2) that must exactly match your training configuration. Using different training parameters will cause generation to fail.
 
 ---
 
 ## Build System & Scripts
 
-### 🔧 CMake Configuration
+### CMake Configuration
 {: .d-inline-block }
 Build
 {: .label .label-grey }
@@ -209,7 +249,7 @@ Build
 - Sets up proper include paths and linking
 - Supports both Debug and Release configurations
 
-### 📜 Helper Scripts
+### Helper Scripts
 {: .d-inline-block }
 Automation
 {: .label .label-grey }
@@ -233,9 +273,10 @@ Automation
 1. **Clone and Build:**
    ```bash
    git clone https://github.com/aarnetalman/HipGPT.git
-   cd hipgpt
+   cd HipGPT
    mkdir build && cd build
-   cmake .. && make
+   cmake .. -DCMAKE_CXX_COMPILER=/usr/bin/hipcc
+   make
    ```
 
 2. **Download Data:**
@@ -250,8 +291,22 @@ Automation
 
 4. **Generate Text:**
    ```bash
-   ./build/generate --model checkpoints/model_final.bin
+   ./build/generate --ckpt gpt_checkpoint.bin --prompt "Once upon a time"
    ```
+
+---
+
+## Training Process
+
+HipGPT uses step-based training rather than epoch-based training:
+
+1. **Tokenizer Training:** BPE vocabulary learned from raw text
+2. **Dataset Preparation:** Text encoded into token sequences
+3. **Model Initialization:** Transformer layers and embeddings created
+4. **Step-based Training Loop:** Fixed number of optimization steps with circular data iteration
+5. **Checkpointing:** Model weights saved periodically and at completion
+
+The training loop processes data in a circular fashion, meaning the same tokens may be seen multiple times across different steps, rather than completing full passes through the dataset.
 
 ---
 
@@ -259,13 +314,12 @@ Automation
 
 HipGPT's architecture follows a clean, modular design that makes transformer internals accessible:
 
-- **🔤 Tokenizer** — Handles text ↔ token conversion
-- **🧠 TransformerLayer** — Implements core attention mechanism  
-- **🏗️ GPTModel** — Orchestrates the complete architecture
-- **⚡ HIP Kernels** — Provides efficient GPU operations
-- **🎯 Training/Generation** — Delivers end-to-end workflows
+- **Tokenizer:** Handles text ↔ token conversion
+- **TransformerLayer:** Implements core attention mechanism  
+- **GPTModel:** Orchestrates the complete architecture
+- **HIP Kernels:** Provides efficient GPU operations
+- **Training/Generation:** Delivers end-to-end workflows
 
 This design enables you to trace the complete journey from **raw text → tokens → embeddings → attention → logits → generated text** with full transparency at every step.
 
-{: .highlight }
-> **Educational Goal:** Every component is implemented from scratch to maximize learning and understanding of transformer architecture internals.
+**Educational Goal:** Every component is implemented from scratch to maximize learning and understanding of transformer architecture internals.
