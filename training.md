@@ -62,7 +62,7 @@ The `run_train.sh` script is a wrapper for the `build/train_gpt` executable. The
 | `--seq` | `int` | `32` | The maximum length of a training sequence (context window). |
 | `--batch` | `int` | `4` | The number of sequences per training batch. |
 | `--steps` | `int` | `10` | The total number of training steps (iterations). |
-| `--lr` | `float` | `1e-2` | The learning rate for the AdamW optimizer. |
+| `--lr` | `float` | `1e-2` | The learning rate for the Adam optimizer. |
 | `--log-every` | `int` | `50` | Frequency (in steps) to print training progress and loss. |
 | `--ckpt-every` | `int` | `500` | Frequency (in steps) to save a model checkpoint. Set to `0` to disable periodic checkpoints. |
 | `--keep-last` | `int` | `5` | The number of recent periodic checkpoints to keep. Older ones will be pruned. Only relevant if `--ckpt-every` is greater than 0. |
