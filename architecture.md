@@ -6,36 +6,6 @@ permalink: /architecture/
 
 # Architecture Overview
 
-## Project Structure
-
-The project is organized into `src` and `include` directories for a clean separation of source and header files.
-
-
-```
-├── build/                 # Build files (created by CMake)
-├── data/                  # Data files (e.g., data.txt)
-├── scripts/               # Helper scripts
-│   ├── download_data.sh
-│   └── run_train.sh
-├── include/               # All public header files (.h)
-│   ├── gpt_model.h
-│   ├── hip_kernels.h
-│   ├── tokenizer.h
-│   └── transformer_layer.h
-│
-├── src/                   # All source files (.cpp)
-│   ├── generate.cpp
-│   ├── gpt_model.cpp
-│   ├── hip_kernels.cpp
-│   ├── tokenizer.cpp
-│   ├── train_gpt.cpp
-│   └── transformer_layer.cpp
-│
-├── CMakeLists.txt         # Main build configuration
-├── LICENSE                # Project's license
-└── README.md              # Project documentation
-```
-
 ## Core Components
 
 ### `GPTModel`
