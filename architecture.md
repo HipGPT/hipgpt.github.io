@@ -82,5 +82,4 @@ Where:
 
 *Memory footprint:*  
 - FP32 weights ≈ 6.2 MB  
-- FP16 weights ≈ 3.1 MB  
 (excluding optimizer states)
