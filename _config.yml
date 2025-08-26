@@ -5,7 +5,7 @@
 #
  author:
    name: Aarne Talman
-   email: aarne@basement.ai
+   # email: aarne@basement.ai
 #
 # The `>` after `description:` means to ignore line-breaks until next key. If
 #   you wish to omit the line-break after the end of text, use `>-` instead.
@@ -66,7 +66,7 @@
      - inference.md
      - architecture.md
      - license.md
-#     - about.md
+#    
 #
 #   Set to `true` to show excerpts on the homepage.
 #   show_excerpts: false
