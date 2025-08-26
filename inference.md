@@ -3,12 +3,23 @@ layout: base
 title: Inference
 permalink: /inference/ 
 ---
-
 # Inference
 
-This section provides instructions and details on how to use a trained GPT model to generate new text.
+This section provides instructions and details on how to use a trained GPT model to generate new text. Inference, or text generation, is handled by the `generate` executable.
 
-## Generating Text
+## 1\. How Text Generation Works
+
+Text generation is an iterative process. The model starts with a prompt and predicts the most likely next token based on the input sequence. This newly generated token is then added to the sequence, and the process repeats. This continues until the desired number of new tokens (`--num_tokens`) is reached or an end-of-sequence token (`--eos_id`) is generated.
+
+The `generate` executable first loads the trained `Tokenizer` from `tokenizer.json` and the `GPTModel` weights from `gpt_checkpoint.bin`. It then tokenizes the user-provided prompt and prepares the input for the model. The `GPTModel::generate` method handles the core generation loop, which includes:
+
+  * Calling the forward pass of the model to get logits for the next token.
+  * Sampling the next token from these logits based on specified parameters like `top_k` and `temperature`.
+  * Appending the new token to the sequence.
+
+For efficiency, the `generate` executable only feeds the most recent tokens up to `max_seq_len` into the model's forward pass during each step.
+
+## 2\. Generating Text
 
 Once the model is trained and you have a `gpt_checkpoint.bin` file, you can use the `generate` executable to create new text based on a prompt.
 
@@ -23,7 +34,9 @@ You can control the output with several parameters, as shown in this more advanc
 ./generate --prompt "My kingdom for a" --num_tokens 100 --top_k 50 --temp 0.8
 ```
 
-### Command-Line Flags Explained
+Output can also be streamed token by token, with an optional delay, by using the `--stream` and `--delay_ms` flags.
+
+### 3\. Command-Line Flags Explained
 
 The `generate` executable is used to produce new text from a trained model.
 
