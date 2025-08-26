@@ -53,3 +53,35 @@ The `hip_kernels.cpp` file contains the low-level HIP code that performs the cor
 * **Multi-Head Attention (`multihead_attention_kernel`)**: Implements the self-attention mechanism by calculating dot products, applying a scaling factor, and performing a weighted sum.
 * **Softmax and Loss Calculation (`softmax_loss_kernel`)**: Computes the softmax activation and the cross-entropy loss in a single kernel for efficiency.
 * **Adam Optimizer (`adam_update_kernel`)**: Updates model weights using the Adam optimization algorithm.
+
+## Model Size
+
+The number of trainable parameters depends on the vocabulary size (`V`) learned from your dataset, along with the transformer hyperparameters:
+
+**Parameter formula (no weight tying):**
+
+```
+
+Total = V·E            (token embeddings)
+\+ S·E            (positional embeddings)
+\+ L·(4E² + 2E·F + F + 9E)   (per transformer layer: QKV, O, FF1/FF2, LayerNorms)
+\+ E·V + V        (final projection + bias)
+
+```
+
+Where:
+- `E` = embedding dimension  
+- `L` = number of layers  
+- `H` = number of attention heads (`E` must be divisible by `H`)  
+- `F` = feed-forward hidden dimension  
+- `V` = vocabulary size  
+- `S` = maximum sequence length  
+
+**Default configuration:**  
+`E=128, L=2, H=4, F=256, V≈5000, S=32`  
+➡️ **~1.55M trainable parameters**
+
+*Memory footprint:*  
+- FP32 weights ≈ 6.2 MB  
+- FP16 weights ≈ 3.1 MB  
+(excluding optimizer states)
