@@ -18,12 +18,12 @@ This project provides a lightweight, from-scratch implementation of a GPT-2 styl
 
 ### Getting Started
 
-To get started with HipGPT, follow the instructions on the [Getting Started](https://www.google.com/search?q=/getting-started/) page. You will learn how to set up the prerequisites, clone the repository, download the dataset, and build the project executables.
+To get started with HipGPT, follow the instructions on the [Getting Started](/getting-started/) page. You will learn how to set up the prerequisites, clone the repository, download the dataset, and build the project executables.
 
 ### How to Use
 
-  * **Training:** The [Training](https://www.google.com/search?q=/training/) page provides detailed information on how to train the model, including a list of all available command-line flags for customizing the training process.
-  * **Generation:** Visit the [Generation](https://www.google.com/search?q=/generation/) page to learn how to use a trained model to generate new text. This page also explains all the command-line options for controlling the text generation.
+  * **Training:** The [Training](/training/) page provides detailed information on how to train the model, including a list of all available command-line flags for customizing the training process.
+  * **Generation:** Visit the [Generation](/generation/) page to learn how to use a trained model to generate new text. This page also explains all the command-line options for controlling the text generation.
 
 ### Project Structure
 
