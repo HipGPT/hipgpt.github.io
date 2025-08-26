@@ -135,7 +135,7 @@ Custom GPU kernels implemented in AMD HIP, providing transparent and educational
 |:----------------|:-----------|
 | **Linear Algebra** | Matrix multiplication, bias addition, transpose |
 | **Attention** | Multi-head QKV computation, scaled dot-product attention |
-| **Activations** | ReLU, Softmax, GELU |
+| **Activations** | ReLU, Softmax |
 | **Normalization** | Layer normalization, dropout |
 | **Training** | Cross-entropy loss, accuracy computation, gradient updates |
 
@@ -155,27 +155,15 @@ CLI
 
 **File:** `src/train_gpt.cpp`
 
-Complete training workflow from raw text to trained model.
-
-**Training Process:**
-```mermaid
-graph LR
-    A[Raw Text] --> B[Tokenizer Training]
-    B --> C[Dataset Preparation]
-    C --> D[Model Initialization]
-    D --> E[Training Loop]
-    E --> F[Checkpointing]
-```
-
 **Command-line Interface:**
 ```bash
 ./build/train_gpt \
-  --data data/tiny_shakespeare.txt \
-  --vocab_size 1000 \
+  --data data/data.txt \
+  --vocab_size 5000 \
   --seq_length 128 \
   --batch_size 32 \
   --learning_rate 3e-4 \
-  --epochs 10
+  --steps 10000
 ```
 
 ---
@@ -240,39 +228,14 @@ Automation
 
 ---
 
-## Data Flow Architecture
-
-The following diagram illustrates how data flows through the HipGPT system:
-
-```mermaid
-graph TD
-    A[Raw Text] --> B[Tokenizer]
-    B --> C[Token IDs]
-    C --> D[Embeddings Layer]
-    D --> E[Transformer Stack]
-    E --> F[Layer 1: Self-Attention + FFN]
-    F --> G[Layer 2: Self-Attention + FFN]
-    G --> H[...]
-    H --> I[Layer N: Self-Attention + FFN]
-    I --> J[Output Projection]
-    J --> K[Vocabulary Logits]
-    K --> L[Loss Computation]
-    
-    style A fill:#e1f5fe
-    style K fill:#f3e5f5
-    style L fill:#fff3e0
-```
-
----
-
 ## Getting Started
 
 1. **Clone and Build:**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/aarnetalman/HipGPT.git
    cd hipgpt
    mkdir build && cd build
-   cmake .. && make -j
+   cmake .. && make
    ```
 
 2. **Download Data:**
