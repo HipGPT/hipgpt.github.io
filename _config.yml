@@ -61,6 +61,7 @@
 #     and list the `path` property (as represented via Liquid) of the pages in
 #     the order they should be rendered.
    nav_pages:
+     - index.md
      - getting-started.md
      - architecture.md
      - training.md
