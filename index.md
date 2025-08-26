@@ -6,13 +6,18 @@ permalink: /
 
 <p align="center">
   <img src="/assets/images/hip-hamster.png" alt="HipGPT Logo" width="200"/>
+  <br/>
+  <em>A lightweight GPT-2 implementation in C++ & HIP</em>
+</p>
+
+<p align="center">
+  <b>Model size (default):</b> ~1.55M params  
+  <sub>(E=128, L=2, H=4, F=256, V≈5k, S=32)</sub>
 </p>
 
 # Welcome to HipGPT Documentation
 
 This project provides a lightweight, from-scratch implementation of a GPT-2 style transformer model written in C++ and accelerated using AMD's **[HIP API](https://rocm.docs.amd.com/projects/HIP/en/latest/)** for ROCm-enabled GPUs. The project is designed to be a clear and understandable guide to the inner workings of large language models.
-
-**Model size (default):** ~1.55M params (E=128, L=2, H=4, F=256, V≈5k, S=32)
 
 The code is intended for educational purposes and is not recommended for production use of any kind. 
 
