@@ -63,9 +63,9 @@ The number of trainable parameters depends on the vocabulary size (`V`) learned 
 ```
 
 Total = V·E            (token embeddings)
-\+ S·E            (positional embeddings)
-\+ L·(4E² + 2E·F + F + 9E)   (per transformer layer: QKV, O, FF1/FF2, LayerNorms)
-\+ E·V + V        (final projection + bias)
+ + S·E            (positional embeddings)
+ + L·(4E² + 2E·F + F + 9E)   (per transformer layer: QKV, O, FF1/FF2, LayerNorms)
+ + E·V + V        (final projection + bias)
 
 ```
 
