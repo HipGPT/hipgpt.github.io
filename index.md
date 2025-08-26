@@ -31,14 +31,12 @@ The code is intended for educational purposes and is not recommended for product
   * **End-to-End Workflow:** The project includes scripts for downloading data, training the model from scratch, and generating new text.
   * **Self-Contained Build System:** The build process is managed by CMake, which automatically fetches the required JSON library.
 
-### Getting Started
+### Documentation
 
-To get started with HipGPT, follow the instructions on the [Getting Started](/getting-started/) page. You will learn how to set up the prerequisites, clone the repository, download the dataset, and build the project executables.
-
-### How to Use
-
-  * **Training:** The [Training](/training/) page provides detailed information on how to train the model, including a list of all available command-line flags for customizing the training process.
-  * **Inference:** Visit the [Inference](/inference/) page to learn how to use a trained model to generate new text. This page also explains all the command-line options for controlling the text generation.
+- 🚀 [Getting Started](/getting-started/)  
+- 🎓 [Training](/training/)  
+- ✨ [Inference](/inference/)  
+- 🏗 [Architecture](/architecture/)  
 
 ### Project Structure
 
