@@ -15,17 +15,17 @@ permalink: /
   <sub>(E=128, L=2, H=4, F=256, V≈5k, S=32)</sub>
 </p>
 
-# Welcome to HipGPT Documentation
-
-This project provides a lightweight, from-scratch implementation of a GPT-2 style transformer model written in C++ and accelerated using AMD's **[HIP API](https://rocm.docs.amd.com/projects/HIP/en/latest/)** for ROCm-enabled GPUs. The project is designed to be a clear and understandable guide to the inner workings of large language models.
-
-The code is intended for educational purposes and is not recommended for production use of any kind. 
-
 <p align="center">
   <a href="https://github.com/aarnetalman/hipgpt" target="_blank">
     <img src="https://img.shields.io/badge/View_on_GitHub-hipgpt-black?logo=github&style=for-the-badge"/>
   </a>
 </p>
+
+# Welcome to HipGPT Documentation
+
+This project provides a lightweight, from-scratch implementation of a GPT-2 style transformer model written in C++ and accelerated using AMD's **[HIP API](https://rocm.docs.amd.com/projects/HIP/en/latest/)** for ROCm-enabled GPUs. The project is designed to be a clear and understandable guide to the inner workings of large language models.
+
+The code is intended for educational purposes and is not recommended for production use of any kind. 
 
 
 ### Key Features:
