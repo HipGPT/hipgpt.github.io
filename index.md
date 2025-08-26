@@ -41,7 +41,8 @@ The code is intended for educational purposes and is not recommended for product
 - 🚀 [Getting Started](/getting-started/)  
 - 🎓 [Training](/training/)  
 - ✨ [Inference](/inference/)  
-- 🏗 [Architecture](/architecture/)  
+- 🏗 [Architecture](/architecture/)
+- 💾 [Codebase](/codebase/)  
 
 ### Project Structure
 
