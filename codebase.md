@@ -1,6 +1,7 @@
 ---
 layout: base
 title: Codebase Overview
+permalink: /codebase/
 ---
 
 # 📂 Codebase Overview
