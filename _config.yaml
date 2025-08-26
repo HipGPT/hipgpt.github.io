@@ -5,7 +5,7 @@ title: HipGPT Documentation
 description: >-
   A comprehensive guide to HipGPT, a GPT-2 implementation in C++ and HIP.
 baseurl: "/" # the subpath of your site, e.g. /blog
-url: "https://hipgpt.github.io" # the base hostname & protocol for your site
+url: "/hipgpt" # the base hostname & protocol for your site
 github_username: aarnetalman
 
 # Build settings
