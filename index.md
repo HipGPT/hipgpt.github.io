@@ -23,7 +23,7 @@ To get started with HipGPT, follow the instructions on the [Getting Started](/ge
 ### How to Use
 
   * **Training:** The [Training](/training/) page provides detailed information on how to train the model, including a list of all available command-line flags for customizing the training process.
-  * **Generation:** Visit the [Generation](/generation/) page to learn how to use a trained model to generate new text. This page also explains all the command-line options for controlling the text generation.
+  * **Inference:** Visit the [Inference](/inference/) page to learn how to use a trained model to generate new text. This page also explains all the command-line options for controlling the text generation.
 
 ### Project Structure
 
