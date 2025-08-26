@@ -44,7 +44,7 @@ The `Tokenizer` is responsible for converting raw text into a format that the mo
 
 ### HIP Kernels
 
-The `hip_kernels.cpp` file contains the low-level HIP code that performs the core computations on the GPU. These kernels are highly optimized for parallel execution on AMD GPUs.
+The `hip_kernels.cpp` file contains the low-level HIP code that performs the core computations on the GPU. These kernels are optimized for parallel execution on AMD GPUs.
 
 **Key Kernels:**
 
