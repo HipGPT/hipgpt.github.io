@@ -14,6 +14,8 @@ This project provides a lightweight, from-scratch implementation of a GPT-2 styl
 
 The code is intended for educational purposes and is not recommended for production use of any kind. 
 
+**Code:** [https://hipgpt.github.io](https://hipgpt.github.io])
+
 ### Key Features:
 
   * **Custom BPE Tokenizer:** A Byte-Pair Encoding tokenizer built from scratch that can be trained on any raw text file. The `Tokenizer` class handles converting raw text into integer token IDs and back.
