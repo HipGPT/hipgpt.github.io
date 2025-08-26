@@ -62,6 +62,8 @@
 #     the order they should be rendered.
    nav_pages:
      - getting-started.md
+     - training.md
+     - inference.md
      - architecture.md
      - license.md
 #     - about.md

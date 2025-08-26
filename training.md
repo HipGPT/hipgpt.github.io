@@ -1,10 +1,10 @@
 ---
 layout: base
-title: Train
-permalink: /train/
+title: Training
+permalink: /training/
 ---
 
-# Train
+# Training
 
 The following section describes how to train your own GPT model from scratch using the provided scripts.
 
