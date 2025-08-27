@@ -26,20 +26,20 @@ hipgpt/
 ├── data/                     # Training datasets
 │   └── data.txt
 ├── scripts/                  # Automation scripts
-│   ├── download\_data.sh      # Dataset fetching
-│   └── run\_train.sh          # End-to-end training
+│   ├── download_data.sh      # Dataset fetching
+│   └── run_train.sh          # End-to-end training
 ├── include/                  # Public headers
-│   ├── gpt\_model.h           # Main model interface
-│   ├── hip\_kernels.h         # GPU kernel declarations
+│   ├── gpt_model.h           # Main model interface
+│   ├── hip_kernels.h         # GPU kernel declarations
 │   ├── tokenizer.h           # BPE tokenizer interface
-│   └── transformer\_layer.h   # Transformer block interface
+│   └── transformer_layer.h   # Transformer block interface
 ├── src/                      # Implementation files
 │   ├── generate.cpp          # Text generation CLI
-│   ├── gpt\_model.cpp         # Model orchestration
-│   ├── hip\_kernels.cpp       # GPU kernel implementations
+│   ├── gpt_model.cpp         # Model orchestration
+│   ├── hip_kernels.cpp       # GPU kernel implementations
 │   ├── tokenizer.cpp         # BPE tokenizer logic
-│   ├── train\_gpt.cpp         # Training CLI
-│   └── transformer\_layer.cpp # Transformer block logic
+│   ├── train_gpt.cpp         # Training CLI
+│   └── transformer_layer.cpp # Transformer block logic
 ├── CMakeLists.txt            # Build configuration
 ├── LICENSE                   # MIT License
 └── README.md                 # Project documentation
@@ -136,7 +136,7 @@ Custom GPU kernels implemented in AMD HIP, providing transparent and educational
 | **Normalization**  | LayerNorm (fwd/bwd), dropout                             |
 | **Embeddings**     | Token/positional lookup and gradients                    |
 | **Training**       | Cross-entropy loss, accuracy computation                 |
-| **Optimization**   | Adam updates, SGD updates                                |
+| **Optimization**   | Adam updates                                |
 | **Sampling**       | Top-k sampling with temperature                          |
 | **Utilities**      | Mean pooling, add-in-place ops                           |
 
