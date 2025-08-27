@@ -25,13 +25,13 @@ Once the model is trained and you have a `gpt_checkpoint.bin` file, you can use 
 
 ```bash
 # Run from the build directory
-./generate --prompt "To be, or not to be:"
+./build/generate --prompt "To be, or not to be:"
 ```
 
 You can control the output with several parameters, as shown in this more advanced example:
 
 ```bash
-./generate --prompt "My kingdom for a" --num_tokens 100 --top_k 50 --temp 0.8
+./build/generate --prompt "My kingdom for a" --num_tokens 100 --top_k 50 --temp 0.8
 ```
 
 Output can also be streamed token by token, with an optional delay, by using the `--stream` and `--delay_ms` flags.
@@ -44,7 +44,7 @@ The `generate` executable is used to produce new text from a trained model.
 | :--- | :--- | :--- | :--- |
 | `--prompt` | `string` | *(required)* | The initial text sequence for the model to continue. Enclose prompts with spaces in quotation marks. |
 | `--num_tokens` | `int` | `50` | The number of new tokens to generate after the prompt. |
-| `--max_seq_len` | `int` | `32` | The context window size used during generation. This should match the `block_size` used during training. |
+| `--max_seq_len` | `int` | `32` | The context window size used during generation. This should match the `--seq` length used during training. |
 | `--ckpt` | `string` | `"gpt_checkpoint.bin"` | Path to the binary file containing the trained model weights. |
 | `--tokenizer` | `string` | `"tokenizer.json"` | Path to the trained tokenizer file. |
 | `--top_k` | `int` | `5` | Restricts the sampling to the top k most likely tokens. This helps prevent incoherent output. Set to `0` to disable. |
