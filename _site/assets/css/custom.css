@@ -22,7 +22,7 @@
 
 .hero .logo {
   margin-top: 1.5rem;
-  max-width: 200px;
+  max-width: 250px;
   width: 80%;
 }
 
@@ -68,3 +68,44 @@
   margin: 0.2rem 0;
   font-family: monospace;
 }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+.hero-cta .btn {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  margin: 0 0.3rem;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+/* Primary CTA (Get Started) */
+.hero-cta .btn {
+  background: #b58900;   /* Solarized yellow-brown */
+  color: #fff;
+}
+.hero-cta .btn:hover {
+  background: #946f00;   /* Darker brown on hover */
+  transform: translateY(-1px);
+}
+
+/* Secondary (GitHub) */
+.hero-cta .btn.secondary {
+  background: #fdf6e3;   /* Solarized light base */
+  color: #333;
+  border: 1px solid #ccc;
+}
+.hero-cta .btn.secondary:hover {
+  background: #eee8d5;
+}
+
