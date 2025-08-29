@@ -104,36 +104,30 @@ The `run_train.sh` script is a wrapper for the `build/train_gpt` executable. The
 
 ### Model Architecture
 
-| Flag | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `--dim` | `int` | `128` | The embedding dimension (also the model dimension). |
-| `--heads` | `int` | `4` | The number of attention heads in the Multi-Head Attention layers. |
-| `--ff` | `int` | `256` | The hidden dimension of the feed-forward network within each transformer block. |
-| `--layers` | `int` | `2` | The number of transformer layers in the model. |
-| `--seq` | `int` | `32` | The maximum length of a training sequence (context window). |
+| Flag       | Type  | Default | Description |
+|------------|-------|---------|-------------|
+| `--dim`    | int   | 256     | The embedding dimension (also the model dimension). |
+| `--heads`  | int   | 8       | The number of attention heads in the Multi-Head Attention layers. |
+| `--ff`     | int   | 1024    | The hidden dimension of the feed-forward network within each transformer block. |
+| `--layers` | int   | 8       | The number of transformer layers in the model. |
+| `--seq`    | int   | 256     | The maximum length of a training sequence (context window). |
 
 ### Training Configuration
 
-| Flag | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `--batch` | `int` | `4` | The number of sequences per training batch. |
-| `--steps` | `int` | `10` | The total number of training steps (iterations). |
-| `--lr` | `float` | `1e-2` | The learning rate for the Adam optimizer. |
-
-### Run Management
-
-| Flag | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `--run-name` | `string` | `"run_[timestamp]"` | Unique identifier for the training run. Creates `checkpoints/[run-name]/` directory. |
-| `--ckpt` | `string` | *(none)* | Path to existing checkpoint to resume training from. |
+| Flag      | Type   | Default | Description |
+|-----------|--------|---------|-------------|
+| `--batch` | int    | 32      | The number of sequences per training batch. |
+| `--steps` | int    | 50000   | The total number of training steps (iterations). |
+| `--lr`    | float  | 3e-4    | The learning rate for the Adam optimizer. |
 
 ### Logging and Checkpointing
 
-| Flag | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `--log-every` | `int` | `50` | Frequency (in steps) to print training progress, loss, perplexity, and accuracy. |
-| `--ckpt-every` | `int` | `500` | Frequency (in steps) to save a model checkpoint. Set to `0` to disable periodic checkpoints. |
-| `--keep-last` | `int` | `5` | The number of recent periodic checkpoints to keep. Older ones will be automatically pruned. |
+| Flag          | Type | Default | Description |
+|---------------|------|---------|-------------|
+| `--log-every` | int  | 50      | Frequency (in steps) to print training progress, loss, perplexity, and accuracy. |
+| `--ckpt-every`| int  | 1000    | Frequency (in steps) to save a model checkpoint. Set to `0` to disable periodic checkpoints. |
+| `--keep-last` | int  | 5       | The number of recent periodic checkpoints to keep. Older ones will be automatically pruned. |
+
 
 ## 5. Training Process Details
 

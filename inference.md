@@ -93,30 +93,35 @@ checkpoints/[run-name]/
 The `generate` executable is used to produce new text from a trained model with advanced sampling capabilities.
 
 ### Required Parameters
+
 | Flag | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `--prompt` | `string` | *(required)* | The initial text sequence for the model to continue. Enclose prompts with spaces in quotation marks. |
 | `--run-name` | `string` | *(required)* | Name of the training run to use for generation. Loads configuration from `checkpoints/[run-name]/`. |
 
 ### Run and Checkpoint Selection
+
 | Flag | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `--step` | `int` | *(latest)* | Specific training step to load. If not specified, uses the latest available checkpoint. |
 
 ### Generation Parameters  
+
 | Flag | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `--num_tokens` | `int` | `50` | The number of new tokens to generate after the prompt. |
-| `--max_seq_len` | `int` | `32` | The context window size used during generation. Should match training configuration. |
+| `--num_tokens` | `int` | `100` | The number of new tokens to generate after the prompt. |
+| `--max_seq_len` | `int` | `256` | The host-side context window size used during generation. Should match training configuration. |
 | `--eos_id` | `int` | `-1` | The end-of-sequence token ID. Generation will stop if this token is produced. Set to `-1` to disable. |
 
 ### Sampling Control
+
 | Flag | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `--top_k` | `int` | `5` | Restricts sampling to the top k most likely tokens. Higher values increase diversity. Set to `0` to disable. |
-| `--temp` | `float` | `1.0` | Sampling temperature. Lower values (0.7) make output more focused, higher values (1.3) increase creativity. |
+| `--top_k` | `int` | `50` | Restricts sampling to the top k most likely tokens. Higher values increase diversity. Set to `0` to disable. |
+| `--temp` | `float` | `0.8` | Sampling temperature. Lower values (0.7) make output more focused, higher values (1.3) increase creativity. |
 | `--top_p` | `float` | `0.9` | Nucleus sampling threshold. Dynamically adjusts the number of tokens considered based on cumulative probability. |
 | `--rep-penalty` | `float` | `1.1` | Repetition penalty applied to previously generated tokens. Values > 1.0 reduce repetition. |
+
 
 ## 5. Sampling Strategies
 

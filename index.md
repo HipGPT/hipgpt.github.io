@@ -7,12 +7,12 @@ permalink: /
 <p align="center">
   <img src="/assets/images/hip-hamster.png" alt="HipGPT Logo" width="200"/>
   <br/>
-  <em>A lightweight GPT-2 implementation in C++ & HIP</em>
+  <em>A lightweight GPT-2 style implementation in C++ & HIP</em>
 </p>
 
 <p align="center">
-  <b>Model size (default):</b> ~1.55M params  
-  <sub>(E=128, L=2, H=4, F=256, V≈5k, S=32)</sub>
+  <b>Model size (recommended small config):</b> ~28M params  
+  <sub>(E=256, L=8, H=8, F=1024, V≈5k, S=256)</sub>
 </p>
 
 <p align="center">
@@ -27,18 +27,17 @@ This project provides a lightweight, from-scratch implementation of a GPT-2 styl
 
 The code is intended for educational purposes and is not recommended for production use of any kind. 
 
-
 ### Key Features:
 
-  * **Custom BPE Tokenizer:** A Byte-Pair Encoding tokenizer built from scratch that can be trained on any raw text file. The `Tokenizer` class handles converting raw text into integer token IDs and back.
-  * **GPT Model Architecture:** A standard GPT-2 style, decoder-only transformer model. The `GPTModel` class manages the token and positional embeddings, stacks multiple `TransformerLayer` instances, and includes a final linear layer to produce output logits over the vocabulary.  
-    * Includes **LayerNorm** before attention and feed-forward sublayers.  
-    * Supports **dropout** during training.  
-  * **HIP Acceleration:** All performance-critical operations, such as matrix multiplication, attention, and layer normalization, are implemented with custom HIP kernels for AMD GPUs.  
-    * Includes optimized **FlashAttention kernels** (for head dimensions 32/64) with a safe fallback implementation.  
-  * **Flexible Sampling:** Text generation supports top-k sampling, temperature scaling, end-of-sequence tokens, **nucleus sampling (top-p)**, and a **repetition penalty**.
-  * **End-to-End Workflow:** The project includes scripts for downloading data, training the model from scratch, and generating new text.
-  * **Self-Contained Build System:** The build process is managed by CMake, which automatically fetches the required JSON library.
+* **Custom BPE Tokenizer:** A Byte-Pair Encoding tokenizer built from scratch that can be trained on any raw text file. The `Tokenizer` class handles converting raw text into integer token IDs and back.
+* **GPT Model Architecture:** A decoder-only transformer inspired by GPT-2. The `GPTModel` class manages token/positional embeddings, stacks multiple `TransformerLayer` instances, and includes a final linear layer to produce output logits over the vocabulary.  
+  * Includes **LayerNorm** before attention and feed-forward sublayers  
+  * Supports **dropout** during training  
+* **HIP Acceleration:** All performance-critical operations (matrix multiplication, attention, layer normalization, etc.) are implemented with custom HIP kernels for AMD GPUs.  
+  * Includes optimized **FlashAttention kernels** (for head dimensions 32/64) with safe fallback implementations  
+* **Flexible Sampling:** Text generation supports top-k, top-p (nucleus), temperature, end-of-sequence tokens, and repetition penalty.  
+* **End-to-End Workflow:** Includes scripts for downloading data, training from scratch, and generating new text.  
+* **Self-Contained Build System:** Build managed by CMake, which fetches dependencies automatically.
 
 ### Documentation
 
@@ -49,8 +48,8 @@ The code is intended for educational purposes and is not recommended for product
 
 ### Project Structure
 
-For a deeper look into the codebase, you can explore the project structure:
+For a deeper look into the codebase, see the [Codebase](/codebase/) section:
 
-  * `include/`: Contains all public header files for the model, kernels, and tokenizer.
-  * `src/`: Contains the corresponding C++ source files for the project's components and executables.
-  * `scripts/`: Holds helper scripts for downloading data and running the training process.
+* `include/`: Public header files (model, kernels, tokenizer, transformer layers)  
+* `src/`: C++ source implementations and CLI entrypoints  
+* `scripts/`: Helper scripts for dataset prep, training, and inference  
