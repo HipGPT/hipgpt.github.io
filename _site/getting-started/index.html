@@ -64,7 +64,7 @@
 
 <p>To get a local copy of the project, use <code class="language-plaintext highlighter-rouge">git</code> to clone the repository:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git git@github.com:aarnetalman/HipGPT.git
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone git@github.com:aarnetalman/HipGPT.git
 <span class="nb">cd </span>HipGPT
 </code></pre></div></div>
 
@@ -102,11 +102,24 @@
 
 <p>After the build completes, you will find the <code class="language-plaintext highlighter-rouge">train_gpt</code> and <code class="language-plaintext highlighter-rouge">generate</code> executables inside the <code class="language-plaintext highlighter-rouge">build</code> directory. If you encounter an error, ensure that <code class="language-plaintext highlighter-rouge">build/train_gpt</code> is present before proceeding.</p>
 
-<h3 id="quick-start-training">Quick Start Training</h3>
+<h2 id="5-quick-start-training">5. Quick Start Training</h2>
 <p>To train with defaults, just run:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./scripts/run_train.sh
 </code></pre></div></div>
+
+<h3 id="default-model-hyperparameters">Default Model Hyperparameters</h3>
+<p>~28M params</p>
+
+<ul>
+  <li><strong>E</strong> = 256 (embedding size)</li>
+  <li><strong>L</strong> = 8 (layers)</li>
+  <li><strong>H</strong> = 8 (attention heads)</li>
+  <li><strong>F</strong> = 1024 (feed-forward size)</li>
+  <li><strong>V</strong> ≈ 5k (vocabulary size)</li>
+  <li><strong>S</strong> = 256 (sequence length)</li>
+</ul>
+
 
       </div>
     </main><link id="fa-stylesheet" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@latest/css/all.min.css">

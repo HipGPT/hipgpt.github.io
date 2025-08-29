@@ -9,7 +9,7 @@ nav_order: 4
 
 This guide will walk you through setting up your environment, cloning the project repository, and building the executables required for training and generation.
 
-## 1\. Prerequisites
+## 1. Prerequisites
 
 Before you begin, ensure your system has the following software installed:
 
@@ -19,18 +19,18 @@ Before you begin, ensure your system has the following software installed:
   * A C++ compiler, such as `g++` or `clang++`.
   * `git` and `wget` for downloading the repository and the dataset.
 
-## 2\. Clone the Repository
+## 2. Clone the Repository
 
 To get a local copy of the project, use `git` to clone the repository:
 
 ```bash
-git git@github.com:aarnetalman/HipGPT.git
+git clone git@github.com:aarnetalman/HipGPT.git
 cd HipGPT
 ```
 
 This will create a `HipGPT` directory containing all the project files.
 
-## 3\. Download the Dataset
+## 3. Download the Dataset
 
 The project includes a convenient script to download the Tiny Shakespeare dataset, which is an excellent starting point for training a language model.
 
@@ -41,7 +41,7 @@ chmod +x scripts/download_data.sh
 
 This command will create a `data/` directory and place a `data.txt` file inside it. If the file already exists, the script will skip the download.
 
-## 4\. Build the Project
+## 4. Build the Project
 
 The project uses CMake to handle the entire build process, including fetching dependencies like the nlohmann/json library.
 
@@ -66,9 +66,20 @@ make
 
 After the build completes, you will find the `train_gpt` and `generate` executables inside the `build` directory. If you encounter an error, ensure that `build/train_gpt` is present before proceeding.
 
-### Quick Start Training
+## 5. Quick Start Training
 To train with defaults, just run:
 
 ```bash
 ./scripts/run_train.sh
 ```
+
+### Default Model Hyperparameters  
+~28M params  
+
+- **E** = 256 (embedding size)  
+- **L** = 8 (layers)  
+- **H** = 8 (attention heads)  
+- **F** = 1024 (feed-forward size)  
+- **V** ≈ 5k (vocabulary size)  
+- **S** = 256 (sequence length)  
+
