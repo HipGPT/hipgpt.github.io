@@ -95,6 +95,7 @@ During training, the model's loss, perplexity, accuracy, and timing are printed 
 The `run_train.sh` script is a wrapper for the `build/train_gpt` executable. The following flags can be passed to the script to customize the training process.
 
 ### Data and Tokenization
+
 | Flag | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `--data-path` | `string` | `"data/data.txt"` | Path to the dataset text file to be used for training. |
@@ -102,6 +103,7 @@ The `run_train.sh` script is a wrapper for the `build/train_gpt` executable. The
 | `--reset` | `flag` | *(none)* | If present, forces the program to retrain the tokenizer and re-tokenize the dataset, even if files already exist in the run directory. |
 
 ### Model Architecture
+
 | Flag | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `--dim` | `int` | `128` | The embedding dimension (also the model dimension). |
@@ -111,6 +113,7 @@ The `run_train.sh` script is a wrapper for the `build/train_gpt` executable. The
 | `--seq` | `int` | `32` | The maximum length of a training sequence (context window). |
 
 ### Training Configuration
+
 | Flag | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `--batch` | `int` | `4` | The number of sequences per training batch. |
@@ -118,12 +121,14 @@ The `run_train.sh` script is a wrapper for the `build/train_gpt` executable. The
 | `--lr` | `float` | `1e-2` | The learning rate for the Adam optimizer. |
 
 ### Run Management
+
 | Flag | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `--run-name` | `string` | `"run_[timestamp]"` | Unique identifier for the training run. Creates `checkpoints/[run-name]/` directory. |
 | `--ckpt` | `string` | *(none)* | Path to existing checkpoint to resume training from. |
 
 ### Logging and Checkpointing
+
 | Flag | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `--log-every` | `int` | `50` | Frequency (in steps) to print training progress, loss, perplexity, and accuracy. |
