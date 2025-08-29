@@ -333,26 +333,31 @@ checkpoints/
 <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">run_dir</span>        <span class="o">=</span> <span class="s">"checkpoints/"</span> <span class="o">+</span> <span class="n">run_name</span><span class="p">;</span>
 </code></pre></div></div>
 
-<h3 id="training-command-with-defaults">Training Command with Defaults</h3>
+<p>With the defaults, <code class="language-plaintext highlighter-rouge">FlashAttention</code> kernels are enabled (head_dim=32).</p>
 
-<p>If you want to run training with all defaults explicitly provided on the command line, you can use:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./scripts/run_train.sh \
-  --data-path data/data.txt \
-  --vocab-size 5000 \
-  --dim 256 \
-  --heads 8 \
-  --ff 1024 \
-  --layers 8 \
-  --seq 256 \
-  --batch 32 \
-  --steps 50000 \
-  --lr 3e-4 \
-  --log-every 50 \
-  --ckpt-every 500 \
-  --keep-last 5 \
-  --run-name default_run
+<h3 id="quick-start">Quick Start</h3>
+<p>To train with defaults, just run:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./scripts/run_train.sh
 </code></pre></div></div>
+<p>If you want to run training with all defaults explicitly provided on the command line, you can use:</p>
 
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./scripts/run_train.sh <span class="se">\</span>
+  <span class="nt">--data-path</span> data/data.txt <span class="se">\</span>
+  <span class="nt">--vocab-size</span> 5000 <span class="se">\</span>
+  <span class="nt">--dim</span> 256 <span class="se">\</span>
+  <span class="nt">--heads</span> 8 <span class="se">\</span>
+  <span class="nt">--ff</span> 1024 <span class="se">\</span>
+  <span class="nt">--layers</span> 8 <span class="se">\</span>
+  <span class="nt">--seq</span> 256 <span class="se">\</span>
+  <span class="nt">--batch</span> 32 <span class="se">\</span>
+  <span class="nt">--steps</span> 50000 <span class="se">\</span>
+  <span class="nt">--lr</span> 3e-4 <span class="se">\</span>
+  <span class="nt">--log-every</span> 50 <span class="se">\</span>
+  <span class="nt">--ckpt-every</span> 500 <span class="se">\</span>
+  <span class="nt">--keep-last</span> 5 <span class="se">\</span>
+  <span class="nt">--run-name</span> default_run
+</code></pre></div></div>
 <p>This command is equivalent to running <code class="language-plaintext highlighter-rouge">./scripts/run_train.sh</code> with no flags, but it shows you every parameter that can be tuned.</p>
 
       </div>

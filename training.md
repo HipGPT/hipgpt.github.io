@@ -178,10 +178,18 @@ std::string run_name       = "run_<timestamp>";
 std::string run_dir        = "checkpoints/" + run_name;
 ```
 
-### Training Command with Defaults
+With the defaults, `FlashAttention` kernels are enabled (head_dim=32).
 
-If you want to run training with all defaults explicitly provided on the command line, you can use:
+### Quick Start
+To train with defaults, just run:
+
+```bash
+./scripts/run_train.sh
 ```
+If you want to run training with all defaults explicitly provided on the command line, you can use:
+
+
+```bash
 ./scripts/run_train.sh \
   --data-path data/data.txt \
   --vocab-size 5000 \
@@ -197,6 +205,5 @@ If you want to run training with all defaults explicitly provided on the command
   --ckpt-every 500 \
   --keep-last 5 \
   --run-name default_run
-```
-
+  ```
 This command is equivalent to running `./scripts/run_train.sh` with no flags, but it shows you every parameter that can be tuned.
