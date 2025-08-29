@@ -10,16 +10,25 @@ permalink: /
   <em>A lightweight GPT-2 style implementation in C++ & HIP</em>
 </p>
 
-<p align="center">
-  <b>Model size (recommended small config):</b> ~28M params  
-  <sub>(E=256, L=8, H=8, F=1024, V≈5k, S=256)</sub>
-</p>
+<div class="model-card">
+  <h3>📐 Default Model Parameters</h3>
+  <p><strong>Recommended small config:</strong> ~28M params</p>
+  <ul>
+    <li><b>E</b> = 256 (embedding size)</li>
+    <li><b>L</b> = 8 (layers)</li>
+    <li><b>H</b> = 8 (attention heads)</li>
+    <li><b>F</b> = 1024 (feed-forward size)</li>
+    <li><b>V</b> ≈ 5k (vocabulary size)</li>
+    <li><b>S</b> = 256 (sequence length)</li>
+  </ul>
+</div>
 
 <p align="center">
   <a href="https://github.com/aarnetalman/hipgpt" target="_blank">
     <img src="https://img.shields.io/badge/View_on_GitHub-hipgpt-black?logo=github&style=for-the-badge"/>
   </a>
 </p>
+
 
 # Welcome to HipGPT Documentation
 
