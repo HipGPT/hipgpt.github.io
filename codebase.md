@@ -1,6 +1,7 @@
 ---
 layout: base
 title: Codebase
+permalink: /codebase/
 nav_order: 3
 ---
 
