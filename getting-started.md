@@ -65,3 +65,10 @@ make
 ```
 
 After the build completes, you will find the `train_gpt` and `generate` executables inside the `build` directory. If you encounter an error, ensure that `build/train_gpt` is present before proceeding.
+
+### Quick Start Training
+To train with defaults, just run:
+
+```bash
+./scripts/run_train.sh
+```
