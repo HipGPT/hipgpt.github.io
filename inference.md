@@ -6,11 +6,30 @@ nav_order: 2
 ---
 # Inference
 
-This section provides instructions and details on how to use a trained GPT model to generate new text. Inference, or text generation, is handled by the `generate` executable.
+This section explains how to use a trained HipGPT model for **text generation** with the `generate` executable.
+
+## Quick Start
+
+Once you have trained a model, you can immediately generate text with:
+
+```bash
+./build/generate --prompt "Hello world" --run-name test_run --num_tokens 50
+```
+### Default Generation Settings
+
+By default, HipGPT uses the following generation parameters:
+
+- `--temp 0.8` (balanced creativity vs. focus)  
+- `--top_k 50` (restricts to top 50 candidates)  
+- `--top_p 0.9` (nucleus sampling for quality)  
+- `--rep-penalty 1.1` (reduces repetition)  
+
+These defaults provide a good balance between coherence and variety for most prompts.
+
 
 ## 1. How Text Generation Works
 
-Text generation is an iterative process. The model starts with a prompt and predicts the most likely next token based on the input sequence. This newly generated token is then added to the sequence, and the process repeats. This continues until the desired number of new tokens (`--num_tokens`) is reached or an end-of-sequence token (`--eos_id`) is generated.
+Text generation is an iterative process. The model starts with a prompt and predicts the most likely next token based on the input sequence. This newly generated token is then added to the sequence, and the process repeats. This continues until the desired number of new tokens (`--num_tokens`) is reached.
 
 The `generate` executable loads the trained model configuration and weights from a training run directory. It automatically resolves the tokenizer and checkpoint paths based on the run configuration. The `GPTModel::generate` method handles the core generation loop, which includes:
 
@@ -148,16 +167,7 @@ Reduces repetitive output by penalizing recently used tokens:
 * Applied before temperature scaling
 * Values between 1.05-1.15 typically work well
 
-## 6. Performance Optimizations
-
-The generation pipeline includes several performance enhancements:
-
-* **Efficient Memory Management**: Reuses GPU buffers across generation steps
-* **Sliding Window Context**: Maintains fixed-size context window for long generations  
-* **Host-Side Sampling**: CPU-based sampling reduces GPU-CPU transfers
-* **Vectorized Operations**: Optimized probability computations
-
-## 7. Example Workflows
+## 6. Example Workflows
 
 ### Quick Test Generation
 ```bash

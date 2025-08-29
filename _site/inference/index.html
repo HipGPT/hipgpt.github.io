@@ -46,11 +46,30 @@
       <div class="wrapper">
         <h1 id="inference">Inference</h1>
 
-<p>This section provides instructions and details on how to use a trained GPT model to generate new text. Inference, or text generation, is handled by the <code class="language-plaintext highlighter-rouge">generate</code> executable.</p>
+<p>This section explains how to use a trained HipGPT model for <strong>text generation</strong> with the <code class="language-plaintext highlighter-rouge">generate</code> executable.</p>
+
+<h2 id="quick-start">Quick Start</h2>
+
+<p>Once you have trained a model, you can immediately generate text with:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./build/generate <span class="nt">--prompt</span> <span class="s2">"Hello world"</span> <span class="nt">--run-name</span> test_run <span class="nt">--num_tokens</span> 50
+</code></pre></div></div>
+<h3 id="default-generation-settings">Default Generation Settings</h3>
+
+<p>By default, HipGPT uses the following generation parameters:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">--temp 0.8</code> (balanced creativity vs. focus)</li>
+  <li><code class="language-plaintext highlighter-rouge">--top_k 50</code> (restricts to top 50 candidates)</li>
+  <li><code class="language-plaintext highlighter-rouge">--top_p 0.9</code> (nucleus sampling for quality)</li>
+  <li><code class="language-plaintext highlighter-rouge">--rep-penalty 1.1</code> (reduces repetition)</li>
+</ul>
+
+<p>These defaults provide a good balance between coherence and variety for most prompts.</p>
 
 <h2 id="1-how-text-generation-works">1. How Text Generation Works</h2>
 
-<p>Text generation is an iterative process. The model starts with a prompt and predicts the most likely next token based on the input sequence. This newly generated token is then added to the sequence, and the process repeats. This continues until the desired number of new tokens (<code class="language-plaintext highlighter-rouge">--num_tokens</code>) is reached or an end-of-sequence token (<code class="language-plaintext highlighter-rouge">--eos_id</code>) is generated.</p>
+<p>Text generation is an iterative process. The model starts with a prompt and predicts the most likely next token based on the input sequence. This newly generated token is then added to the sequence, and the process repeats. This continues until the desired number of new tokens (<code class="language-plaintext highlighter-rouge">--num_tokens</code>) is reached.</p>
 
 <p>The <code class="language-plaintext highlighter-rouge">generate</code> executable loads the trained model configuration and weights from a training run directory. It automatically resolves the tokenizer and checkpoint paths based on the run configuration. The <code class="language-plaintext highlighter-rouge">GPTModel::generate</code> method handles the core generation loop, which includes:</p>
 
@@ -285,18 +304,7 @@
   <li>Values between 1.05-1.15 typically work well</li>
 </ul>
 
-<h2 id="6-performance-optimizations">6. Performance Optimizations</h2>
-
-<p>The generation pipeline includes several performance enhancements:</p>
-
-<ul>
-  <li><strong>Efficient Memory Management</strong>: Reuses GPU buffers across generation steps</li>
-  <li><strong>Sliding Window Context</strong>: Maintains fixed-size context window for long generations</li>
-  <li><strong>Host-Side Sampling</strong>: CPU-based sampling reduces GPU-CPU transfers</li>
-  <li><strong>Vectorized Operations</strong>: Optimized probability computations</li>
-</ul>
-
-<h2 id="7-example-workflows">7. Example Workflows</h2>
+<h2 id="6-example-workflows">6. Example Workflows</h2>
 
 <h3 id="quick-test-generation">Quick Test Generation</h3>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Fast test with a simple prompt</span>
