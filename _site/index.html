@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Home | 🐹 HipGPT</title>
+<meta name="generator" content="Jekyll v4.3.4" />
+<meta property="og:title" content="Home" />
+<meta name="author" content="Aarne Talman" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/" />
+<meta property="og:url" content="http://localhost:4000/" />
+<meta property="og:site_name" content="🐹 HipGPT" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Home" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","author":{"@type":"Person","name":"Aarne Talman"},"headline":"Home","name":"🐹 HipGPT","url":"http://localhost:4000/"}</script>
+<!-- End Jekyll SEO tag -->
+<link id="main-stylesheet" rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/custom.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="🐹 HipGPT" />
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper">
+    <a class="site-title" rel="author" href="/">🐹 HipGPT</a>
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon"></span>
+        </label>
+
+        <div class="nav-items">
+  <a class="nav-item" href="/">Home</a>
+  <a class="nav-item" href="/getting-started/">Getting Started</a>
+  <a class="nav-item" href="/training/">Training</a>
+  <a class="nav-item" href="/inference/">Inference</a>
+  <a class="nav-item" href="/codebase/">Codebase</a>
+  <a class="nav-item" href="/license/">License</a>
+</div>
+
+      </nav>
+  </div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <section class="hero">
+  <img class="logo" src="/assets/images/hip-hamster.png" alt="HipGPT Logo" />
+  <p class="tagline">A lightweight GPT-2 style implementation in C++ &amp; HIP</p>
+  <p>
+    <a href="https://github.com/aarnetalman/hipgpt" target="_blank">
+      <img src="https://img.shields.io/badge/View_on_GitHub-hipgpt-black?logo=github&amp;style=for-the-badge" />
+    </a>
+  </p>
+</section>
+
+<h1 id="welcome-to-hipgpt-documentation">Welcome to HipGPT Documentation</h1>
+
+<p>This project provides a lightweight, from-scratch implementation of a GPT-2 style transformer model written in C++ and accelerated using AMD’s <strong><a href="https://rocm.docs.amd.com/projects/HIP/en/latest/">HIP API</a></strong> for ROCm-enabled GPUs.</p>
+
+<div class="model-card">
+  <h3>Default Model Parameters</h3>
+  <p><strong>Recommended small config:</strong> ~28M params</p>
+  <ul>
+    <li><b>E</b> = 256 (embedding size)</li>
+    <li><b>L</b> = 8 (layers)</li>
+    <li><b>H</b> = 8 (attention heads)</li>
+    <li><b>F</b> = 1024 (feed-forward size)</li>
+    <li><b>V</b> ≈ 5k (vocabulary size)</li>
+    <li><b>S</b> = 256 (sequence length)</li>
+  </ul>
+</div>
+
+<p>The project is designed to be a clear and understandable guide to the inner workings of large language models.</p>
+
+<p>The code is intended for educational purposes and is not recommended for production use of any kind.</p>
+
+<h3 id="key-features">Key Features:</h3>
+
+<ul>
+  <li><strong>Custom BPE Tokenizer:</strong> A Byte-Pair Encoding tokenizer built from scratch that can be trained on any raw text file. The <code class="language-plaintext highlighter-rouge">Tokenizer</code> class handles converting raw text into integer token IDs and back.</li>
+  <li><strong>GPT Model Architecture:</strong> A decoder-only transformer inspired by GPT-2. The <code class="language-plaintext highlighter-rouge">GPTModel</code> class manages token/positional embeddings, stacks multiple <code class="language-plaintext highlighter-rouge">TransformerLayer</code> instances, and includes a final linear layer to produce output logits over the vocabulary.
+    <ul>
+      <li>Includes <strong>LayerNorm</strong> before attention and feed-forward sublayers</li>
+      <li>Supports <strong>dropout</strong> during training</li>
+    </ul>
+  </li>
+  <li><strong>HIP Acceleration:</strong> All performance-critical operations (matrix multiplication, attention, layer normalization, etc.) are implemented with custom HIP kernels for AMD GPUs.
+    <ul>
+      <li>Includes optimized <strong>FlashAttention kernels</strong> (for head dimensions 32/64) with safe fallback implementations</li>
+    </ul>
+  </li>
+  <li><strong>Flexible Sampling:</strong> Text generation supports top-k, top-p (nucleus), temperature, end-of-sequence tokens, and repetition penalty.</li>
+  <li><strong>End-to-End Workflow:</strong> Includes scripts for downloading data, training from scratch, and generating new text.</li>
+  <li><strong>Self-Contained Build System:</strong> Build managed by CMake, which fetches dependencies automatically.</li>
+</ul>
+
+<h3 id="documentation">Documentation</h3>
+
+<ul>
+  <li>🚀 <a href="/getting-started/">Getting Started</a></li>
+  <li>🎓 <a href="/training/">Training</a></li>
+  <li>✨ <a href="/inference/">Inference</a></li>
+  <li>🏗 <a href="/codebase/">Codebase</a></li>
+</ul>
+
+<h3 id="project-structure">Project Structure</h3>
+
+<p>For a deeper look into the codebase, see the <a href="/codebase/">Codebase</a> section:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">include/</code>: Public header files (model, kernels, tokenizer, transformer layers)</li>
+  <li><code class="language-plaintext highlighter-rouge">src/</code>: C++ source implementations and CLI entrypoints</li>
+  <li><code class="language-plaintext highlighter-rouge">scripts/</code>: Helper scripts for dataset prep, training, and inference</li>
+</ul>
+
+      </div>
+    </main><link id="fa-stylesheet" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@latest/css/all.min.css">
+
+<footer class="site-footer h-card">
+  <data class="u-url" value="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <ul class="contact-list">
+          <li class="p-name">Aarne Talman</li>
+          
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li>
+    <a rel="me" href="https://github.com/aarnetalman/hipgpt" target="_blank" title="HipGPT">
+      <span class="grey fa-brands fa-github fa-lg"></span>
+    </a>
+  </li>
+</ul>
+</div>
+
+  </div>
+
+</footer>
+
+</body>
+
+</html>

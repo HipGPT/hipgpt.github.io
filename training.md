@@ -35,6 +35,7 @@ HipGPT uses a **run-based training system** that organizes each training session
 
 Each training run is stored in a separate directory:
 ```
+
 checkpoints/
 ├── [run-name]/
 │   ├── tokenizer.json
@@ -43,7 +44,8 @@ checkpoints/
 │   ├── [run-name]_step100_config.json
 │   ├── latest_checkpoint.bin → [symlink]
 │   └── latest_config.json → [symlink]
-```
+
+````
 
 ### Checkpoint Features
 
@@ -60,7 +62,7 @@ To train the model from scratch, you can use the `run_train.sh` script from the 
 # From the project's root directory
 chmod +x scripts/run_train.sh
 ./scripts/run_train.sh
-```
+````
 
 ### Named Training Runs
 
@@ -96,38 +98,37 @@ The `run_train.sh` script is a wrapper for the `build/train_gpt` executable. The
 
 ### Data and Tokenization
 
-| Flag | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `--data-path` | `string` | `"data/data.txt"` | Path to the dataset text file to be used for training. |
-| `--vocab-size` | `int` | `5000` | The maximum size of the vocabulary to be created by the BPE tokenizer. |
-| `--reset` | `flag` | *(none)* | If present, forces the program to retrain the tokenizer and re-tokenize the dataset, even if files already exist in the run directory. |
+| Flag           | Type     | Default           | Description                                                                                                                            |
+| :------------- | :------- | :---------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
+| `--data-path`  | `string` | `"data/data.txt"` | Path to the dataset text file to be used for training.                                                                                 |
+| `--vocab-size` | `int`    | `5000`            | The maximum size of the vocabulary to be created by the BPE tokenizer.                                                                 |
+| `--reset`      | `flag`   | *(none)*          | If present, forces the program to retrain the tokenizer and re-tokenize the dataset, even if files already exist in the run directory. |
 
 ### Model Architecture
 
-| Flag       | Type  | Default | Description |
-|------------|-------|---------|-------------|
-| `--dim`    | int   | 256     | The embedding dimension (also the model dimension). |
-| `--heads`  | int   | 8       | The number of attention heads in the Multi-Head Attention layers. |
-| `--ff`     | int   | 1024    | The hidden dimension of the feed-forward network within each transformer block. |
-| `--layers` | int   | 8       | The number of transformer layers in the model. |
-| `--seq`    | int   | 256     | The maximum length of a training sequence (context window). |
+| Flag       | Type | Default | Description                                                                     |
+| ---------- | ---- | ------- | ------------------------------------------------------------------------------- |
+| `--dim`    | int  | 256     | The embedding dimension (also the model dimension).                             |
+| `--heads`  | int  | 8       | The number of attention heads in the Multi-Head Attention layers.               |
+| `--ff`     | int  | 1024    | The hidden dimension of the feed-forward network within each transformer block. |
+| `--layers` | int  | 8       | The number of transformer layers in the model.                                  |
+| `--seq`    | int  | 256     | The maximum length of a training sequence (context window).                     |
 
 ### Training Configuration
 
-| Flag      | Type   | Default | Description |
-|-----------|--------|---------|-------------|
-| `--batch` | int    | 32      | The number of sequences per training batch. |
-| `--steps` | int    | 50000   | The total number of training steps (iterations). |
-| `--lr`    | float  | 3e-4    | The learning rate for the Adam optimizer. |
+| Flag      | Type  | Default | Description                                      |
+| --------- | ----- | ------- | ------------------------------------------------ |
+| `--batch` | int   | 32      | The number of sequences per training batch.      |
+| `--steps` | int   | 50000   | The total number of training steps (iterations). |
+| `--lr`    | float | 3e-4    | The learning rate for the Adam optimizer.        |
 
 ### Logging and Checkpointing
 
-| Flag          | Type | Default | Description |
-|---------------|------|---------|-------------|
-| `--log-every` | int  | 50      | Frequency (in steps) to print training progress, loss, perplexity, and accuracy. |
-| `--ckpt-every`| int  | 1000    | Frequency (in steps) to save a model checkpoint. Set to `0` to disable periodic checkpoints. |
-| `--keep-last` | int  | 5       | The number of recent periodic checkpoints to keep. Older ones will be automatically pruned. |
-
+| Flag           | Type | Default | Description                                                                                  |
+| -------------- | ---- | ------- | -------------------------------------------------------------------------------------------- |
+| `--log-every`  | int  | 50      | Frequency (in steps) to print training progress, loss, perplexity, and accuracy.             |
+| `--ckpt-every` | int  | 1000    | Frequency (in steps) to save a model checkpoint. Set to `0` to disable periodic checkpoints. |
+| `--keep-last`  | int  | 5       | The number of recent periodic checkpoints to keep. Older ones will be automatically pruned.  |
 
 ## 5. Training Process Details
 
@@ -147,3 +148,55 @@ HipGPT uses step-based training rather than epoch-based training:
 * **Flash Attention**: Optimized attention implementation for supported head dimensions (32, 64)
 * **Memory Management**: Efficient GPU memory allocation with proper cleanup
 * **Numerical Stability**: Improved softmax and layer normalization implementations
+
+
+## 6. Default Hyperparameters and Paths
+
+Below are the defaults used by `train_gpt` if no flags are provided:
+
+```cpp
+// Hyperparameters
+int max_seq_len    = 256;
+int embed_dim      = 256;
+int num_heads      = 8;
+int ff_hidden_dim  = 1024;
+int num_layers     = 8;
+int batch_size     = 32;
+int num_steps      = 50000;
+float learning_rate = 3e-4f;
+int vocab_size_limit = 5000;
+
+// File paths
+std::string data_path      = "data/data.txt";
+std::string tokenizer_path = "tokenizer.json";
+std::string tokens_path    = "tokens.bin";
+bool force_reset           = false;
+int log_every              = 50;
+int ckpt_every             = 500;
+int keep_last              = 5;
+std::string run_name       = "run_<timestamp>";
+std::string run_dir        = "checkpoints/" + run_name;
+```
+
+### Training Command with Defaults
+
+If you want to run training with all defaults explicitly provided on the command line, you can use:
+```
+./scripts/run_train.sh \
+  --data-path data/data.txt \
+  --vocab-size 5000 \
+  --dim 256 \
+  --heads 8 \
+  --ff 1024 \
+  --layers 8 \
+  --seq 256 \
+  --batch 32 \
+  --steps 50000 \
+  --lr 3e-4 \
+  --log-every 50 \
+  --ckpt-every 500 \
+  --keep-last 5 \
+  --run-name default_run
+```
+
+This command is equivalent to running `./scripts/run_train.sh` with no flags, but it shows you every parameter that can be tuned.

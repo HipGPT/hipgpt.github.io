@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Codebase | 🐹 HipGPT</title>
+<meta name="generator" content="Jekyll v4.3.4" />
+<meta property="og:title" content="Codebase" />
+<meta name="author" content="Aarne Talman" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/codebase/" />
+<meta property="og:url" content="http://localhost:4000/codebase/" />
+<meta property="og:site_name" content="🐹 HipGPT" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Codebase" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Aarne Talman"},"headline":"Codebase","url":"http://localhost:4000/codebase/"}</script>
+<!-- End Jekyll SEO tag -->
+<link id="main-stylesheet" rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/custom.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="🐹 HipGPT" />
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper">
+    <a class="site-title" rel="author" href="/">🐹 HipGPT</a>
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon"></span>
+        </label>
+
+        <div class="nav-items">
+  <a class="nav-item" href="/">Home</a>
+  <a class="nav-item" href="/getting-started/">Getting Started</a>
+  <a class="nav-item" href="/training/">Training</a>
+  <a class="nav-item" href="/inference/">Inference</a>
+  <a class="nav-item" href="/codebase/">Codebase</a>
+  <a class="nav-item" href="/license/">License</a>
+</div>
+
+      </nav>
+  </div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <h1 class="no_toc" id="codebase-overview">Codebase Overview</h1>
+
+<p>This page provides a comprehensive guide to the HipGPT codebase architecture and explains the purpose of each component. The project is designed to be <strong>self-contained</strong>, <strong>readable</strong>, and <strong>educational</strong>, allowing you to understand how a GPT-style transformer works from the ground up.</p>
+
+<h2 class="no_toc text-delta" id="table-of-contents">Table of Contents</h2>
+
+<ol id="markdown-toc">
+  <li><a href="#project-structure" id="markdown-toc-project-structure">Project Structure</a></li>
+  <li><a href="#core-components" id="markdown-toc-core-components">Core Components</a>    <ol>
+      <li><a href="#tokenizer" id="markdown-toc-tokenizer">Tokenizer</a></li>
+      <li><a href="#transformer-layer" id="markdown-toc-transformer-layer">Transformer Layer</a></li>
+      <li><a href="#gpt-model" id="markdown-toc-gpt-model">GPT Model</a></li>
+      <li><a href="#hip-kernels" id="markdown-toc-hip-kernels">HIP Kernels</a></li>
+    </ol>
+  </li>
+  <li><a href="#application-entry-points" id="markdown-toc-application-entry-points">Application Entry Points</a>    <ol>
+      <li><a href="#training-pipeline" id="markdown-toc-training-pipeline">Training Pipeline</a></li>
+      <li><a href="#text-generation" id="markdown-toc-text-generation">Text Generation</a></li>
+    </ol>
+  </li>
+  <li><a href="#build-system--scripts" id="markdown-toc-build-system--scripts">Build System &amp; Scripts</a>    <ol>
+      <li><a href="#cmake-configuration" id="markdown-toc-cmake-configuration">CMake Configuration</a></li>
+      <li><a href="#helper-scripts" id="markdown-toc-helper-scripts">Helper Scripts</a></li>
+    </ol>
+  </li>
+  <li><a href="#advanced-features" id="markdown-toc-advanced-features">Advanced Features</a>    <ol>
+      <li><a href="#flash-attention-implementation" id="markdown-toc-flash-attention-implementation">Flash Attention Implementation</a></li>
+      <li><a href="#gradient-clipping-and-optimization" id="markdown-toc-gradient-clipping-and-optimization">Gradient Clipping and Optimization</a></li>
+      <li><a href="#memory-management" id="markdown-toc-memory-management">Memory Management</a></li>
+    </ol>
+  </li>
+  <li><a href="#getting-started" id="markdown-toc-getting-started">Getting Started</a></li>
+  <li><a href="#training-process" id="markdown-toc-training-process">Training Process</a>    <ol>
+      <li><a href="#key-training-improvements" id="markdown-toc-key-training-improvements">Key Training Improvements</a></li>
+    </ol>
+  </li>
+  <li><a href="#advanced-kernel-implementations" id="markdown-toc-advanced-kernel-implementations">Advanced Kernel Implementations</a>    <ol>
+      <li><a href="#flash-attention" id="markdown-toc-flash-attention">Flash Attention</a></li>
+      <li><a href="#tiled-matrix-multiplication" id="markdown-toc-tiled-matrix-multiplication">Tiled Matrix Multiplication</a></li>
+      <li><a href="#layer-normalization" id="markdown-toc-layer-normalization">Layer Normalization</a></li>
+    </ol>
+  </li>
+  <li><a href="#configuration-management" id="markdown-toc-configuration-management">Configuration Management</a>    <ol>
+      <li><a href="#json-configuration-system" id="markdown-toc-json-configuration-system">JSON Configuration System</a></li>
+      <li><a href="#automatic-path-resolution" id="markdown-toc-automatic-path-resolution">Automatic Path Resolution</a></li>
+    </ol>
+  </li>
+  <li><a href="#summary" id="markdown-toc-summary">Summary</a></li>
+</ol>
+
+<hr />
+
+<h2 id="project-structure">Project Structure</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hipgpt/
+├── build/                    # Build outputs (CMake artifacts)
+├── data/                     # Training datasets
+│   └── data.txt
+├── checkpoints/              # Training runs and model checkpoints
+│   └── [run-name]/
+│       ├── tokenizer.json
+│       ├── tokens.bin
+│       ├── [run-name]_stepN.bin
+│       ├── [run-name]_stepN_config.json
+│       ├── latest_checkpoint.bin → [symlink]
+│       └── latest_config.json → [symlink]
+├── scripts/                  # Automation scripts
+│   ├── download_data.sh      # Dataset fetching
+│   ├── run_train.sh          # End-to-end training
+│   └── run_generate.sh       # Text generation wrapper
+├── include/                  # Public headers
+│   ├── gpt_model.h           # Main model interface
+│   ├── hip_kernels.h         # GPU kernel declarations
+│   ├── tokenizer.h           # BPE tokenizer interface
+│   └── transformer_layer.h   # Transformer block interface
+├── src/                      # Implementation files
+│   ├── generate.cpp          # Text generation CLI
+│   ├── gpt_model.cpp         # Model orchestration
+│   ├── hip_kernels.cpp       # GPU kernel implementations
+│   ├── tokenizer.cpp         # BPE tokenizer logic
+│   ├── train_gpt.cpp         # Training CLI
+│   └── transformer_layer.cpp # Transformer block logic
+├── CMakeLists.txt            # Build configuration
+├── LICENSE                   # MIT License
+└── README.md                 # Project documentation
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="core-components">Core Components</h2>
+
+<h3 class="d-inline-block" id="tokenizer">Tokenizer</h3>
+<p class="label label-blue">Essential</p>
+
+<p><strong>Files:</strong> <code class="language-plaintext highlighter-rouge">src/tokenizer.cpp</code>, <code class="language-plaintext highlighter-rouge">include/tokenizer.h</code></p>
+
+<p>The tokenizer implements Byte-Pair Encoding (BPE) from scratch, handling the conversion between human-readable text and model-compatible token sequences.</p>
+
+<p><strong>Key Responsibilities:</strong></p>
+<ul>
+  <li><strong>Vocabulary Training:</strong> Learns subword tokens from training corpus</li>
+  <li><strong>Text Encoding:</strong> Converts strings to token ID sequences</li>
+  <li><strong>Text Decoding:</strong> Reconstructs text from token sequences</li>
+  <li><strong>Serialization:</strong> Saves/loads trained vocabulary using JSON</li>
+</ul>
+
+<p><strong>Usage Example:</strong></p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Tokenizer</span> <span class="nf">tokenizer</span><span class="p">(</span><span class="mi">5000</span><span class="p">);</span>
+<span class="n">tokenizer</span><span class="p">.</span><span class="n">train_bpe</span><span class="p">(</span><span class="n">text</span><span class="p">);</span>
+<span class="n">tokenizer</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="s">"tokenizer.json"</span><span class="p">);</span>
+<span class="k">auto</span> <span class="n">tokens</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s">"Hello, world!"</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">text</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="n">tokens</span><span class="p">);</span>
+</code></pre></div></div>
+
+<hr />
+
+<h3 class="d-inline-block" id="transformer-layer">Transformer Layer</h3>
+<p class="label label-green">Core</p>
+
+<p><strong>Files:</strong> <code class="language-plaintext highlighter-rouge">src/transformer_layer.cpp</code>, <code class="language-plaintext highlighter-rouge">include/transformer_layer.h</code></p>
+
+<p>Implements a single GPT-style transformer block containing the fundamental attention and feed-forward mechanisms with advanced optimizations.</p>
+
+<p><strong>Architecture Components:</strong></p>
+
+<ul>
+  <li><strong>Multi-Head Self-Attention:</strong> Parallel attention heads with QKV projections and Flash Attention optimization</li>
+  <li><strong>Feed-Forward Network:</strong> Two-layer MLP with ReLU activation</li>
+  <li><strong>Residual Connections:</strong> Skip connections around attention and FFN</li>
+  <li><strong>Layer Normalization:</strong> Pre-normalization for stable training with efficient GPU reductions</li>
+  <li><strong>Dropout:</strong> Configurable regularization during training phase</li>
+  <li><strong>Adam Optimization:</strong> Built-in Adam optimizer states for all parameters</li>
+</ul>
+
+<p><strong>Advanced Features:</strong></p>
+<ul>
+  <li><strong>Memory Management:</strong> Dynamic buffer allocation based on batch size</li>
+  <li><strong>Gradient Accumulation:</strong> Proper backpropagation through all components</li>
+  <li><strong>Parameter Management:</strong> Comprehensive save/load for all weights and optimizer states</li>
+</ul>
+
+<hr />
+
+<h3 class="d-inline-block" id="gpt-model">GPT Model</h3>
+<p class="label label-purple">Architecture</p>
+
+<p><strong>Files:</strong> <code class="language-plaintext highlighter-rouge">src/gpt_model.cpp</code>, <code class="language-plaintext highlighter-rouge">include/gpt_model.h</code></p>
+
+<p>The main model class that orchestrates the complete GPT architecture by combining embeddings, transformer layers, and output projections with advanced training features.</p>
+
+<p><strong>Model Pipeline:</strong></p>
+
+<ol>
+  <li><strong>Token Embeddings:</strong> Maps token IDs to dense vectors</li>
+  <li><strong>Positional Embeddings:</strong> Adds position information</li>
+  <li><strong>Transformer Stack:</strong> Sequential transformer layers with residual connections</li>
+  <li><strong>Output Projection:</strong> Linear layer to vocabulary logits</li>
+  <li><strong>Loss Computation:</strong> Cross-entropy with numerical stability improvements</li>
+</ol>
+
+<p><strong>Training Features:</strong></p>
+<ul>
+  <li><strong>Gradient Clipping:</strong> L2 norm clipping to prevent gradient explosion</li>
+  <li><strong>Adam Optimization:</strong> Advanced optimizer with momentum and bias correction</li>
+  <li><strong>Checkpoint Management:</strong> Complete model state serialization</li>
+</ul>
+
+<p><strong>Generation Features:</strong></p>
+<ul>
+  <li><strong>Advanced Sampling:</strong> Top-k, top-p (nucleus), temperature, and repetition penalty</li>
+  <li><strong>Sliding Window:</strong> Efficient long sequence generation with context management</li>
+  <li><strong>Memory Efficiency:</strong> Optimized GPU memory allocation during inference</li>
+</ul>
+
+<hr />
+
+<h3 class="d-inline-block" id="hip-kernels">HIP Kernels</h3>
+<p class="label label-yellow">Performance</p>
+
+<p><strong>Files:</strong> <code class="language-plaintext highlighter-rouge">src/hip_kernels.cpp</code>, <code class="language-plaintext highlighter-rouge">include/hip_kernels.h</code></p>
+
+<p>Custom GPU kernels implemented in AMD HIP, providing transparent and educational implementations of all neural network operations with significant performance optimizations.</p>
+
+<p><strong>Implemented Operations:</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Kernel Category</th>
+      <th style="text-align: left">Operations</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><strong>Linear Algebra</strong></td>
+      <td style="text-align: left">Tiled matrix multiplication with shared memory, bias addition, transpose variants</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>Attention</strong></td>
+      <td style="text-align: left">Flash Attention implementation, scaled dot-product with numerical stability</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>Activations</strong></td>
+      <td style="text-align: left">ReLU (fwd/bwd), Softmax with improved numerical stability</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>Normalization</strong></td>
+      <td style="text-align: left">LayerNorm with efficient block reductions, dropout with device-side RNG</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>Embeddings</strong></td>
+      <td style="text-align: left">Vectorized token/positional lookup, gradient accumulation</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>Training</strong></td>
+      <td style="text-align: left">Cross-entropy loss with stability, accuracy computation</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>Optimization</strong></td>
+      <td style="text-align: left">Adam updates with bias correction, gradient L2 norm computation</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>Sampling</strong></td>
+      <td style="text-align: left">Advanced top-k/top-p sampling with temperature scaling</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>Memory Utilities</strong></td>
+      <td style="text-align: left">Gradient clipping, in-place operations, mean pooling</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Performance Optimizations:</strong></p>
+<ul>
+  <li><strong>Tiled Matrix Multiplication:</strong> Shared memory usage for improved cache efficiency</li>
+  <li><strong>Flash Attention:</strong> Memory-efficient attention for supported head dimensions (32, 64)</li>
+  <li><strong>Vectorized Memory Access:</strong> float4 operations for improved bandwidth utilization</li>
+  <li><strong>Efficient Reductions:</strong> Warp-level and block-level parallel reductions</li>
+  <li><strong>Numerical Stability:</strong> Improved softmax, layer normalization, and loss computations</li>
+</ul>
+
+<hr />
+
+<h2 id="application-entry-points">Application Entry Points</h2>
+
+<h3 class="d-inline-block" id="training-pipeline">Training Pipeline</h3>
+<p class="label label-red">CLI</p>
+
+<p><strong>File:</strong> <code class="language-plaintext highlighter-rouge">src/train_gpt.cpp</code></p>
+
+<p>Complete training workflow from raw text to trained model using step-based training with comprehensive checkpoint management.</p>
+
+<p><strong>Run-Based Training System:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./build/train_gpt <span class="se">\</span>
+  <span class="nt">--data-path</span> data/data.txt <span class="se">\</span>
+  <span class="nt">--run-name</span> shakespeare_v1 <span class="se">\</span>
+  <span class="nt">--vocab-size</span> 5000 <span class="se">\</span>
+  <span class="nt">--seq</span> 32 <span class="se">\</span>
+  <span class="nt">--dim</span> 128 <span class="se">\</span>
+  <span class="nt">--heads</span> 4 <span class="se">\</span>
+  <span class="nt">--ff</span> 256 <span class="se">\</span>
+  <span class="nt">--layers</span> 2 <span class="se">\</span>
+  <span class="nt">--batch</span> 4 <span class="se">\</span>
+  <span class="nt">--steps</span> 2000 <span class="se">\</span>
+  <span class="nt">--lr</span> 1e-2 <span class="se">\</span>
+  <span class="nt">--ckpt-every</span> 500 <span class="se">\</span>
+  <span class="nt">--keep-last</span> 5
+</code></pre></div></div>
+
+<p><strong>Key Features:</strong></p>
+<ul>
+  <li><strong>Run Organization:</strong> Each training session stored in <code class="language-plaintext highlighter-rouge">checkpoints/[run-name]/</code></li>
+  <li><strong>Checkpoint Pruning:</strong> Automatic cleanup of old checkpoints</li>
+  <li><strong>Resume Training:</strong> Seamless continuation from any checkpoint</li>
+  <li><strong>Configuration Management:</strong> JSON configs saved with each checkpoint</li>
+  <li><strong>Progress Tracking:</strong> Loss, perplexity, accuracy, and timing metrics</li>
+</ul>
+
+<hr />
+
+<h3 class="d-inline-block" id="text-generation">Text Generation</h3>
+<p class="label label-red">CLI</p>
+
+<p><strong>File:</strong> <code class="language-plaintext highlighter-rouge">src/generate.cpp</code></p>
+
+<p>Interactive text generation interface for trained models with advanced sampling capabilities.</p>
+
+<p><strong>Run-Based Generation:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./build/generate <span class="se">\</span>
+  <span class="nt">--prompt</span> <span class="s2">"To be or not to be"</span> <span class="se">\</span>
+  <span class="nt">--run-name</span> shakespeare_v1 <span class="se">\</span>
+  <span class="nt">--step</span> 2000 <span class="se">\</span>
+  <span class="nt">--num_tokens</span> 100 <span class="se">\</span>
+  <span class="nt">--temp</span> 0.8 <span class="se">\</span>
+  <span class="nt">--top_k</span> 20 <span class="se">\</span>
+  <span class="nt">--top_p</span> 0.9 <span class="se">\</span>
+  <span class="nt">--rep-penalty</span> 1.1
+</code></pre></div></div>
+
+<p><strong>Advanced Features:</strong></p>
+<ul>
+  <li><strong>Automatic Configuration:</strong> Loads model config from run directory</li>
+  <li><strong>Multiple Sampling Methods:</strong> Top-k, top-p, temperature, repetition penalty</li>
+  <li><strong>Streaming Output:</strong> Real-time token generation display</li>
+  <li><strong>Context Management:</strong> Sliding window for long sequence generation</li>
+</ul>
+
+<hr />
+
+<h2 id="build-system--scripts">Build System &amp; Scripts</h2>
+
+<h3 id="cmake-configuration">CMake Configuration</h3>
+<p><strong>File:</strong> <code class="language-plaintext highlighter-rouge">CMakeLists.txt</code></p>
+
+<ul>
+  <li>Configures HIP compilation with <code class="language-plaintext highlighter-rouge">hipcc</code></li>
+  <li>Fetches nlohmann/json dependency</li>
+  <li>Sets up include paths and linking</li>
+  <li>Supports Debug/Release builds</li>
+</ul>
+
+<h3 id="helper-scripts">Helper Scripts</h3>
+
+<p><strong>Data Management:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./scripts/download_data.sh
+</code></pre></div></div>
+
+<p><strong>Training Automation:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./scripts/run_train.sh <span class="o">[</span>custom_args...]
+</code></pre></div></div>
+
+<p><strong>Generation Wrapper:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./scripts/run_generate.sh <span class="nt">--prompt</span> <span class="s2">"Hello"</span> <span class="nt">--run-name</span> my_model
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="advanced-features">Advanced Features</h2>
+
+<h3 id="flash-attention-implementation">Flash Attention Implementation</h3>
+<p>HipGPT includes an optimized Flash Attention implementation that provides memory-efficient attention computation:</p>
+
+<ul>
+  <li><strong>Supported Configurations:</strong> Head dimensions of 32 and 64 with sequences up to 512</li>
+  <li><strong>Memory Efficiency:</strong> Processes attention in blocks to fit in GPU shared memory</li>
+  <li><strong>Numerical Stability:</strong> Online softmax computation with stable exponentials</li>
+  <li><strong>Fallback Support:</strong> Automatic fallback to standard attention for unsupported configurations</li>
+</ul>
+
+<h3 id="gradient-clipping-and-optimization">Gradient Clipping and Optimization</h3>
+<p>The training pipeline includes robust gradient management:</p>
+
+<ul>
+  <li><strong>Device-Side Clipping:</strong> L2 norm computation and scaling entirely on GPU</li>
+  <li><strong>Global Gradient Norm:</strong> Accumulates norms across all parameter groups</li>
+  <li><strong>Configurable Threshold:</strong> Default maximum norm of 1.0 (adjustable)</li>
+  <li><strong>Adam with Bias Correction:</strong> Proper bias correction for momentum terms</li>
+</ul>
+
+<h3 id="memory-management">Memory Management</h3>
+<p>Comprehensive memory management for efficient GPU utilization:</p>
+
+<ul>
+  <li><strong>Dynamic Buffer Allocation:</strong> Temporary buffers allocated based on batch size</li>
+  <li><strong>Automatic Cleanup:</strong> RAII-style memory management in destructors</li>
+  <li><strong>Memory Reuse:</strong> Buffers reused across training steps and generation sequences</li>
+  <li><strong>Error Handling:</strong> Proper error checking for all GPU allocations</li>
+</ul>
+
+<hr />
+
+<h2 id="getting-started">Getting Started</h2>
+
+<ol>
+  <li><strong>Clone and Build:</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/aarnetalman/HipGPT.git
+<span class="nb">cd </span>HipGPT
+<span class="nb">mkdir </span>build <span class="o">&amp;&amp;</span> <span class="nb">cd </span>build
+cmake .. <span class="nt">-DCMAKE_CXX_COMPILER</span><span class="o">=</span>/usr/bin/hipcc
+make
+</code></pre></div>    </div>
+  </li>
+  <li><strong>Download Data:</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./scripts/download_data.sh
+</code></pre></div>    </div>
+  </li>
+  <li><strong>Train Model:</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./scripts/run_train.sh <span class="nt">--run-name</span> my_first_model <span class="nt">--steps</span> 1000
+</code></pre></div>    </div>
+  </li>
+  <li><strong>Generate Text:</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./scripts/run_generate.sh <span class="nt">--prompt</span> <span class="s2">"Once upon a time"</span> <span class="nt">--run-name</span> my_first_model
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<hr />
+
+<h2 id="training-process">Training Process</h2>
+
+<p>HipGPT uses step-based training with comprehensive checkpoint management:</p>
+
+<ol>
+  <li><strong>Run Initialization:</strong> Creates organized directory structure for each training session</li>
+  <li><strong>Tokenizer Training:</strong> BPE vocabulary learned from raw text and cached</li>
+  <li><strong>Dataset Preparation:</strong> Text encoded into token sequences and stored efficiently</li>
+  <li><strong>Model Initialization:</strong> Transformer layers and embeddings created with proper weight initialization</li>
+  <li><strong>Training Loop:</strong> Fixed number of optimization steps with circular data iteration</li>
+  <li><strong>Advanced Optimization:</strong> Gradient clipping, Adam updates, and numerical stability improvements</li>
+  <li><strong>Checkpoint Management:</strong> Automatic saving, pruning, and symlink management</li>
+</ol>
+
+<h3 id="key-training-improvements">Key Training Improvements</h3>
+
+<p><strong>Gradient Clipping Pipeline:</strong></p>
+<ul>
+  <li>Device-side L2 norm computation across all parameter groups</li>
+  <li>Automatic scaling when gradients exceed threshold (default: 1.0)</li>
+  <li>Applied before optimizer updates for training stability</li>
+</ul>
+
+<p><strong>Memory Optimization:</strong></p>
+<ul>
+  <li>Dynamic buffer allocation based on actual batch sizes</li>
+  <li>Proper cleanup and memory reuse patterns</li>
+  <li>RAII-style resource management</li>
+</ul>
+
+<p><strong>Numerical Stability:</strong></p>
+<ul>
+  <li>Improved softmax computation with better overflow handling</li>
+  <li>Enhanced layer normalization with efficient parallel reductions</li>
+  <li>Stable cross-entropy loss computation</li>
+</ul>
+
+<hr />
+
+<h2 id="advanced-kernel-implementations">Advanced Kernel Implementations</h2>
+
+<h3 id="flash-attention">Flash Attention</h3>
+<p>The HIP kernels include a custom Flash Attention implementation:</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">template</span><span class="o">&lt;</span><span class="kt">int</span> <span class="n">HEAD_DIM</span><span class="p">&gt;</span>
+<span class="n">__global__</span> <span class="kt">void</span> <span class="n">flash_attention_kernel</span><span class="p">(</span>
+    <span class="k">const</span> <span class="kt">float</span><span class="o">*</span> <span class="n">Q</span><span class="p">,</span> <span class="k">const</span> <span class="kt">float</span><span class="o">*</span> <span class="n">K</span><span class="p">,</span> <span class="k">const</span> <span class="kt">float</span><span class="o">*</span> <span class="n">V</span><span class="p">,</span> <span class="kt">float</span><span class="o">*</span> <span class="n">output</span><span class="p">,</span>
+    <span class="kt">int</span> <span class="n">B</span><span class="p">,</span> <span class="kt">int</span> <span class="n">S</span><span class="p">,</span> <span class="kt">int</span> <span class="n">E</span><span class="p">,</span> <span class="kt">int</span> <span class="n">H</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Features:</strong></p>
+<ul>
+  <li><strong>Memory Efficient:</strong> Processes attention in blocks to fit in shared memory</li>
+  <li><strong>Online Softmax:</strong> Stable computation without storing full attention matrix</li>
+  <li><strong>Template Specialization:</strong> Optimized versions for head dimensions 32 and 64</li>
+  <li><strong>Fallback Support:</strong> Automatic fallback for unsupported configurations</li>
+</ul>
+
+<h3 id="tiled-matrix-multiplication">Tiled Matrix Multiplication</h3>
+<p>Optimized matrix operations with shared memory tiling:</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">__global__</span> <span class="kt">void</span> <span class="n">matmul_tiled_kernel</span><span class="p">(</span><span class="k">const</span> <span class="kt">float</span><span class="o">*</span> <span class="n">A</span><span class="p">,</span> <span class="k">const</span> <span class="kt">float</span><span class="o">*</span> <span class="n">B</span><span class="p">,</span> <span class="kt">float</span><span class="o">*</span> <span class="n">C</span><span class="p">,</span>
+                                   <span class="kt">int</span> <span class="n">M</span><span class="p">,</span> <span class="kt">int</span> <span class="n">N</span><span class="p">,</span> <span class="kt">int</span> <span class="n">K</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Optimizations:</strong></p>
+<ul>
+  <li><strong>Shared Memory Tiling:</strong> 32x32 tiles for improved cache utilization</li>
+  <li><strong>Memory Coalescing:</strong> Optimized memory access patterns</li>
+  <li><strong>Bank Conflict Avoidance:</strong> Careful shared memory layout design</li>
+</ul>
+
+<h3 id="layer-normalization">Layer Normalization</h3>
+<p>Efficient layer normalization with parallel reductions:</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">__global__</span> <span class="kt">void</span> <span class="n">layer_norm_forward</span><span class="p">(</span>
+    <span class="k">const</span> <span class="kt">float</span><span class="o">*</span> <span class="n">input</span><span class="p">,</span> <span class="kt">float</span><span class="o">*</span> <span class="n">output</span><span class="p">,</span> 
+    <span class="k">const</span> <span class="kt">float</span><span class="o">*</span> <span class="n">gamma</span><span class="p">,</span> <span class="k">const</span> <span class="kt">float</span><span class="o">*</span> <span class="n">beta</span><span class="p">,</span>
+    <span class="kt">int</span> <span class="n">N</span><span class="p">,</span> <span class="kt">int</span> <span class="n">E</span><span class="p">,</span> <span class="kt">float</span> <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="n">f</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Features:</strong></p>
+<ul>
+  <li><strong>Warp-Level Reductions:</strong> Fast parallel computation of mean and variance</li>
+  <li><strong>Vectorized Memory Access:</strong> float4 operations where possible</li>
+  <li><strong>Numerical Stability:</strong> Robust handling of small variances</li>
+</ul>
+
+<hr />
+
+<h2 id="configuration-management">Configuration Management</h2>
+
+<h3 id="json-configuration-system">JSON Configuration System</h3>
+<p>Training runs generate comprehensive configuration files:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"model"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"vocab_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">5000</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"max_seq_len"</span><span class="p">:</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"embed_dim"</span><span class="p">:</span><span class="w"> </span><span class="mi">128</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"num_heads"</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ff_hidden_dim"</span><span class="p">:</span><span class="w"> </span><span class="mi">256</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"num_layers"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"tokenizer"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tokenizer.json"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"tokens_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tokens.bin"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"training"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"batch_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"learning_rate"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.01</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"steps"</span><span class="p">:</span><span class="w"> </span><span class="mi">2000</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"checkpoint"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"latest"</span><span class="p">:</span><span class="w"> </span><span class="s2">"model_step2000.bin"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"step"</span><span class="p">:</span><span class="w"> </span><span class="mi">2000</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="automatic-path-resolution">Automatic Path Resolution</h3>
+<p>The generation pipeline automatically resolves file paths:</p>
+<ul>
+  <li>Configuration files specify relative paths within run directories</li>
+  <li>Symlinks maintain references to latest checkpoints</li>
+  <li>Error handling for missing or corrupted configurations</li>
+</ul>
+
+<hr />
+
+<h2 id="summary">Summary</h2>
+
+<p>HipGPT’s architecture is modular and optimized:</p>
+
+<ul>
+  <li><strong>Tokenizer:</strong> Efficient BPE implementation with caching</li>
+  <li><strong>TransformerLayer:</strong> Advanced attention and FFN with Flash Attention</li>
+  <li><strong>GPTModel:</strong> Complete architecture with gradient clipping and Adam optimization</li>
+  <li><strong>HIP Kernels:</strong> High-performance GPU operations with memory optimizations</li>
+  <li><strong>Training/Generation:</strong> Production-ready workflows with comprehensive checkpoint management</li>
+</ul>
+
+<p><strong>Educational Goal:</strong> Full transparency from <strong>raw text → tokens → embeddings → attention → logits → generated text</strong> with industry-standard optimizations and numerical stability improvements.</p>
+
+      </div>
+    </main><link id="fa-stylesheet" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@latest/css/all.min.css">
+
+<footer class="site-footer h-card">
+  <data class="u-url" value="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <ul class="contact-list">
+          <li class="p-name">Aarne Talman</li>
+          
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li>
+    <a rel="me" href="https://github.com/aarnetalman/hipgpt" target="_blank" title="HipGPT">
+      <span class="grey fa-brands fa-github fa-lg"></span>
+    </a>
+  </li>
+</ul>
+</div>
+
+  </div>
+
+</footer>
+
+</body>
+
+</html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Training | 🐹 HipGPT</title>
+<meta name="generator" content="Jekyll v4.3.4" />
+<meta property="og:title" content="Training" />
+<meta name="author" content="Aarne Talman" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/training/" />
+<meta property="og:url" content="http://localhost:4000/training/" />
+<meta property="og:site_name" content="🐹 HipGPT" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Training" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Aarne Talman"},"headline":"Training","url":"http://localhost:4000/training/"}</script>
+<!-- End Jekyll SEO tag -->
+<link id="main-stylesheet" rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/custom.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="🐹 HipGPT" />
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper">
+    <a class="site-title" rel="author" href="/">🐹 HipGPT</a>
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon"></span>
+        </label>
+
+        <div class="nav-items">
+  <a class="nav-item" href="/">Home</a>
+  <a class="nav-item" href="/getting-started/">Getting Started</a>
+  <a class="nav-item" href="/training/">Training</a>
+  <a class="nav-item" href="/inference/">Inference</a>
+  <a class="nav-item" href="/codebase/">Codebase</a>
+  <a class="nav-item" href="/license/">License</a>
+</div>
+
+      </nav>
+  </div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <h1 id="training">Training</h1>
+
+<p>The following section describes the process of training your own GPT model from scratch, including an overview of the data preparation, the training loop, and a detailed list of all available command-line flags.</p>
+
+<h2 id="1-data-and-tokenizer">1. Data and Tokenizer</h2>
+
+<p>The training process begins with preparing the dataset and the tokenizer.</p>
+
+<ul>
+  <li>The <code class="language-plaintext highlighter-rouge">train_gpt</code> executable first checks for the existence of <code class="language-plaintext highlighter-rouge">tokenizer.json</code> and <code class="language-plaintext highlighter-rouge">tokens.bin</code> in the run directory.</li>
+  <li>If these files are not found, or if the <code class="language-plaintext highlighter-rouge">--reset</code> flag is used, it will train a new Byte-Pair Encoding (BPE) tokenizer on the text file specified by <code class="language-plaintext highlighter-rouge">--data-path</code> (default: <code class="language-plaintext highlighter-rouge">data/data.txt</code>).</li>
+  <li>The trained tokenizer is then saved to the run directory as <code class="language-plaintext highlighter-rouge">tokenizer.json</code>, and the entire dataset is tokenized and saved as a binary file to <code class="language-plaintext highlighter-rouge">tokens.bin</code>. This binary file speeds up future training runs by skipping the tokenization step.</li>
+  <li>The final vocabulary size is determined by the <code class="language-plaintext highlighter-rouge">vocab-size</code> parameter.</li>
+</ul>
+
+<p>The tokenizer is a custom Byte-Pair Encoding (BPE) tokenizer that can be trained from scratch on any raw text file. Its primary function is to convert raw text into a sequence of integer token IDs that the model can understand, and to convert these IDs back into human-readable text.</p>
+
+<p>The tokenizer works as follows:</p>
+
+<ol>
+  <li><strong>Initialization</strong>: The tokenizer first builds an initial vocabulary from the individual characters in the training text. Special tokens, like <code class="language-plaintext highlighter-rouge">&lt;/w&gt;</code> to denote the end of a word, are also added to the initial vocabulary.</li>
+  <li><strong>Training</strong>: The tokenizer’s <code class="language-plaintext highlighter-rouge">train_bpe</code> method is responsible for learning the vocabulary from a given text. It repeatedly finds the most frequent pair of tokens in the corpus and merges them into a new, single token. This process continues until the vocabulary reaches a predefined size limit (<code class="language-plaintext highlighter-rouge">vocab_limit_</code>), which can be set using the <code class="language-plaintext highlighter-rouge">--vocab-size</code> flag during training.</li>
+  <li><strong>Encoding</strong>: The <code class="language-plaintext highlighter-rouge">encode</code> method takes a string of text and converts it into a vector of integer IDs. To do this, it first splits the text into words, then for each word, it applies the merges learned during training to break the word down into the largest possible sub-word tokens from the vocabulary. A cache is used to speed up the encoding of repeated words. If a token is not in the vocabulary, it is silently dropped.</li>
+  <li><strong>Decoding</strong>: The <code class="language-plaintext highlighter-rouge">decode</code> method performs the reverse operation, converting a vector of integer IDs back into a human-readable string. It removes the special end-of-word token <code class="language-plaintext highlighter-rouge">&lt;/w&gt;</code> and adds a space to reconstruct the original text structure.</li>
+</ol>
+
+<h2 id="2-training-runs-and-checkpoint-management">2. Training Runs and Checkpoint Management</h2>
+
+<p>HipGPT uses a <strong>run-based training system</strong> that organizes each training session with unique identifiers and comprehensive checkpoint management.</p>
+
+<h3 id="run-organization">Run Organization</h3>
+
+<p>Each training run is stored in a separate directory:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+checkpoints/
+├── [run-name]/
+│   ├── tokenizer.json
+│   ├── tokens.bin
+│   ├── [run-name]_step100.bin
+│   ├── [run-name]_step100_config.json
+│   ├── latest_checkpoint.bin → [symlink]
+│   └── latest_config.json → [symlink]
+
+</code></pre></div></div>
+
+<h3 id="checkpoint-features">Checkpoint Features</h3>
+
+<ul>
+  <li><strong>Automatic Checkpointing</strong>: Saves model weights and configuration at specified intervals (<code class="language-plaintext highlighter-rouge">--ckpt-every</code>)</li>
+  <li><strong>Checkpoint Pruning</strong>: Keeps only the most recent checkpoints (<code class="language-plaintext highlighter-rouge">--keep-last</code>) to manage disk space</li>
+  <li><strong>Resume Training</strong>: Can resume from any checkpoint using <code class="language-plaintext highlighter-rouge">--ckpt</code> flag</li>
+  <li><strong>Symlink Management</strong>: Maintains <code class="language-plaintext highlighter-rouge">latest_checkpoint.bin</code> and <code class="language-plaintext highlighter-rouge">latest_config.json</code> symlinks for easy access</li>
+</ul>
+
+<h2 id="3-training-the-model">3. Training the Model</h2>
+
+<p>To train the model from scratch, you can use the <code class="language-plaintext highlighter-rouge">run_train.sh</code> script from the project’s root directory. This script is a convenient wrapper around the <code class="language-plaintext highlighter-rouge">build/train_gpt</code> executable.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># From the project's root directory</span>
+<span class="nb">chmod</span> +x scripts/run_train.sh
+./scripts/run_train.sh
+</code></pre></div></div>
+
+<h3 id="named-training-runs">Named Training Runs</h3>
+
+<p>You can create organized training runs with custom names:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./scripts/run_train.sh <span class="nt">--run-name</span> shakespeare_v1 <span class="nt">--steps</span> 2000
+</code></pre></div></div>
+
+<p>This creates a <code class="language-plaintext highlighter-rouge">checkpoints/shakespeare_v1/</code> directory with all associated files.</p>
+
+<h3 id="resuming-training">Resuming Training</h3>
+
+<p>To continue training from a checkpoint:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./scripts/run_train.sh <span class="nt">--run-name</span> shakespeare_v1 <span class="nt">--ckpt</span> checkpoints/shakespeare_v1/shakespeare_v1_step1000.bin <span class="nt">--steps</span> 1000
+</code></pre></div></div>
+
+<p>The script will produce organized artifacts in the run directory:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">tokenizer.json</code>: The trained vocabulary and merges</li>
+  <li><code class="language-plaintext highlighter-rouge">tokens.bin</code>: Pre-tokenized dataset for efficient loading</li>
+  <li><code class="language-plaintext highlighter-rouge">[run-name]_stepN.bin</code>: Model weights at step N</li>
+  <li><code class="language-plaintext highlighter-rouge">[run-name]_stepN_config.json</code>: Complete configuration for step N</li>
+  <li><code class="language-plaintext highlighter-rouge">latest_checkpoint.bin</code> and <code class="language-plaintext highlighter-rouge">latest_config.json</code>: Symlinks to most recent files</li>
+</ul>
+
+<p>During training, the model’s loss, perplexity, accuracy, and timing are printed at intervals defined by <code class="language-plaintext highlighter-rouge">--log-every</code>. The script automatically saves periodic checkpoints and prunes old ones to prevent excessive disk usage.</p>
+
+<h2 id="4-command-line-flags-explained">4. Command-Line Flags Explained</h2>
+
+<p>The <code class="language-plaintext highlighter-rouge">run_train.sh</code> script is a wrapper for the <code class="language-plaintext highlighter-rouge">build/train_gpt</code> executable. The following flags can be passed to the script to customize the training process.</p>
+
+<h3 id="data-and-tokenization">Data and Tokenization</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Flag</th>
+      <th style="text-align: left">Type</th>
+      <th style="text-align: left">Default</th>
+      <th style="text-align: left">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--data-path</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">string</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">"data/data.txt"</code></td>
+      <td style="text-align: left">Path to the dataset text file to be used for training.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--vocab-size</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">int</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">5000</code></td>
+      <td style="text-align: left">The maximum size of the vocabulary to be created by the BPE tokenizer.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">--reset</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">flag</code></td>
+      <td style="text-align: left"><em>(none)</em></td>
+      <td style="text-align: left">If present, forces the program to retrain the tokenizer and re-tokenize the dataset, even if files already exist in the run directory.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="model-architecture">Model Architecture</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Flag</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">--dim</code></td>
+      <td>int</td>
+      <td>256</td>
+      <td>The embedding dimension (also the model dimension).</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">--heads</code></td>
+      <td>int</td>
+      <td>8</td>
+      <td>The number of attention heads in the Multi-Head Attention layers.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">--ff</code></td>
+      <td>int</td>
+      <td>1024</td>
+      <td>The hidden dimension of the feed-forward network within each transformer block.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">--layers</code></td>
+      <td>int</td>
+      <td>8</td>
+      <td>The number of transformer layers in the model.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">--seq</code></td>
+      <td>int</td>
+      <td>256</td>
+      <td>The maximum length of a training sequence (context window).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="training-configuration">Training Configuration</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Flag</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">--batch</code></td>
+      <td>int</td>
+      <td>32</td>
+      <td>The number of sequences per training batch.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">--steps</code></td>
+      <td>int</td>
+      <td>50000</td>
+      <td>The total number of training steps (iterations).</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">--lr</code></td>
+      <td>float</td>
+      <td>3e-4</td>
+      <td>The learning rate for the Adam optimizer.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="logging-and-checkpointing">Logging and Checkpointing</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Flag</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">--log-every</code></td>
+      <td>int</td>
+      <td>50</td>
+      <td>Frequency (in steps) to print training progress, loss, perplexity, and accuracy.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">--ckpt-every</code></td>
+      <td>int</td>
+      <td>1000</td>
+      <td>Frequency (in steps) to save a model checkpoint. Set to <code class="language-plaintext highlighter-rouge">0</code> to disable periodic checkpoints.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">--keep-last</code></td>
+      <td>int</td>
+      <td>5</td>
+      <td>The number of recent periodic checkpoints to keep. Older ones will be automatically pruned.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="5-training-process-details">5. Training Process Details</h2>
+
+<p>HipGPT uses step-based training rather than epoch-based training:</p>
+
+<ol>
+  <li><strong>Tokenizer Training</strong>: BPE vocabulary learned from raw text</li>
+  <li><strong>Dataset Preparation</strong>: Text encoded into token sequences and cached</li>
+  <li><strong>Model Initialization</strong>: Transformer layers and embeddings created with random weights</li>
+  <li><strong>Training Loop</strong>: Fixed number of optimization steps with circular data iteration</li>
+  <li><strong>Gradient Clipping</strong>: L2 norm clipping applied to prevent gradient explosion</li>
+  <li><strong>Adam Optimization</strong>: Advanced optimizer with momentum and adaptive learning rates</li>
+  <li><strong>Checkpointing</strong>: Weights and configuration saved periodically and at completion</li>
+</ol>
+
+<h3 id="advanced-features">Advanced Features</h3>
+
+<ul>
+  <li><strong>Gradient Clipping</strong>: Automatic L2 norm clipping with configurable maximum norm (default: 1.0)</li>
+  <li><strong>Flash Attention</strong>: Optimized attention implementation for supported head dimensions (32, 64)</li>
+  <li><strong>Memory Management</strong>: Efficient GPU memory allocation with proper cleanup</li>
+  <li><strong>Numerical Stability</strong>: Improved softmax and layer normalization implementations</li>
+</ul>
+
+<h2 id="6-default-hyperparameters-and-paths">6. Default Hyperparameters and Paths</h2>
+
+<p>Below are the defaults used by <code class="language-plaintext highlighter-rouge">train_gpt</code> if no flags are provided:</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Hyperparameters</span>
+<span class="kt">int</span> <span class="n">max_seq_len</span>    <span class="o">=</span> <span class="mi">256</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">embed_dim</span>      <span class="o">=</span> <span class="mi">256</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">num_heads</span>      <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">ff_hidden_dim</span>  <span class="o">=</span> <span class="mi">1024</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">num_layers</span>     <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">batch_size</span>     <span class="o">=</span> <span class="mi">32</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">num_steps</span>      <span class="o">=</span> <span class="mi">50000</span><span class="p">;</span>
+<span class="kt">float</span> <span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">3e-4</span><span class="n">f</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">vocab_size_limit</span> <span class="o">=</span> <span class="mi">5000</span><span class="p">;</span>
+
+<span class="c1">// File paths</span>
+<span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">data_path</span>      <span class="o">=</span> <span class="s">"data/data.txt"</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">tokenizer_path</span> <span class="o">=</span> <span class="s">"tokenizer.json"</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">tokens_path</span>    <span class="o">=</span> <span class="s">"tokens.bin"</span><span class="p">;</span>
+<span class="kt">bool</span> <span class="n">force_reset</span>           <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">log_every</span>              <span class="o">=</span> <span class="mi">50</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">ckpt_every</span>             <span class="o">=</span> <span class="mi">500</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">keep_last</span>              <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">run_name</span>       <span class="o">=</span> <span class="s">"run_&lt;timestamp&gt;"</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">run_dir</span>        <span class="o">=</span> <span class="s">"checkpoints/"</span> <span class="o">+</span> <span class="n">run_name</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h3 id="training-command-with-defaults">Training Command with Defaults</h3>
+
+<p>If you want to run training with all defaults explicitly provided on the command line, you can use:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./scripts/run_train.sh \
+  --data-path data/data.txt \
+  --vocab-size 5000 \
+  --dim 256 \
+  --heads 8 \
+  --ff 1024 \
+  --layers 8 \
+  --seq 256 \
+  --batch 32 \
+  --steps 50000 \
+  --lr 3e-4 \
+  --log-every 50 \
+  --ckpt-every 500 \
+  --keep-last 5 \
+  --run-name default_run
+</code></pre></div></div>
+
+<p>This command is equivalent to running <code class="language-plaintext highlighter-rouge">./scripts/run_train.sh</code> with no flags, but it shows you every parameter that can be tuned.</p>
+
+      </div>
+    </main><link id="fa-stylesheet" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@latest/css/all.min.css">
+
+<footer class="site-footer h-card">
+  <data class="u-url" value="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <ul class="contact-list">
+          <li class="p-name">Aarne Talman</li>
+          
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li>
+    <a rel="me" href="https://github.com/aarnetalman/hipgpt" target="_blank" title="HipGPT">
+      <span class="grey fa-brands fa-github fa-lg"></span>
+    </a>
+  </li>
+</ul>
+</div>
+
+  </div>
+
+</footer>
+
+</body>
+
+</html>
