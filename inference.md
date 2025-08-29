@@ -138,7 +138,7 @@ Restricts consideration to the k most probable tokens:
 * Prevents extremely unlikely tokens from being selected
 * Higher k values allow more diversity
 
-### Top_p (Nucleus) Sampling
+### Top-p (Nucleus) Sampling
 Dynamically selects tokens based on cumulative probability:
 * More adaptive than top-k for different contexts
 * Maintains quality while allowing flexibility
