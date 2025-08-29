@@ -36,7 +36,7 @@ HipGPT uses a **run-based training system** that organizes each training session
 Each training run is stored in a separate directory:
 ```
 checkpoints/
-├── run_[timestamp]/
+├── run-name/
 │   ├── tokenizer.json
 │   ├── tokens.bin
 │   ├── [run-name]_step100.bin
