@@ -1,5 +1,0 @@
-{{ site.title | escape }}
-{%- for path in site.header_pages -%} {%- assign my_page = site.pages | where: "name", path | first -%} {%- if my_page.title -%} {{ my_page.title | escape }} {%- endif -%} {%- endfor -%}
-{{ page.title | escape }}
-
-{{ content }}

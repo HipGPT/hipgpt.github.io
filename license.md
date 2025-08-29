@@ -2,6 +2,7 @@
 layout: base 
 title: License 
 permalink: /license/
+nav_order: 5
 ---
 # License
 

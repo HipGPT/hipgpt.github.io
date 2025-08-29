@@ -31,8 +31,12 @@ The code is intended for educational purposes and is not recommended for product
 ### Key Features:
 
   * **Custom BPE Tokenizer:** A Byte-Pair Encoding tokenizer built from scratch that can be trained on any raw text file. The `Tokenizer` class handles converting raw text into integer token IDs and back.
-  * **GPT Model Architecture:** A standard GPT-2 style, decoder-only transformer model. The `GPTModel` class manages the token and positional embeddings, stacks multiple `TransformerLayer` instances, and includes a final linear layer to produce output logits over the vocabulary.
-  * **HIP Acceleration:** All performance-critical operations, such as matrix multiplication, attention, and layer normalization, are implemented with custom HIP kernels for AMD GPUs.
+  * **GPT Model Architecture:** A standard GPT-2 style, decoder-only transformer model. The `GPTModel` class manages the token and positional embeddings, stacks multiple `TransformerLayer` instances, and includes a final linear layer to produce output logits over the vocabulary.  
+    * Includes **LayerNorm** before attention and feed-forward sublayers.  
+    * Supports **dropout** during training.  
+  * **HIP Acceleration:** All performance-critical operations, such as matrix multiplication, attention, and layer normalization, are implemented with custom HIP kernels for AMD GPUs.  
+    * Includes optimized **FlashAttention kernels** (for head dimensions 32/64) with a safe fallback implementation.  
+  * **Flexible Sampling:** Text generation supports top-k sampling, temperature scaling, end-of-sequence tokens, **nucleus sampling (top-p)**, and a **repetition penalty**.
   * **End-to-End Workflow:** The project includes scripts for downloading data, training the model from scratch, and generating new text.
   * **Self-Contained Build System:** The build process is managed by CMake, which automatically fetches the required JSON library.
 
